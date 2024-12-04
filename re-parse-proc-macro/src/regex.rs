@@ -1,6 +1,6 @@
+use crate::arena::{Arena, ArenaIndex};
 use crate::parser::{ParseError, RegexParser};
 use crate::tokenizer::tokenize;
-use crate::arena::{Arena, ArenaIndex};
 use std::fmt::{Debug, Display, Formatter, Write};
 
 pub type RegexArena = Arena<RegexNode>;

@@ -18,7 +18,6 @@ pub enum PostfixToken {
     Plus,
 }
 
-
 impl Display for Token {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match *self {
@@ -29,7 +28,7 @@ impl Display for Token {
                 PostfixToken::QuestionMark => f.write_char('?'),
                 PostfixToken::Star => f.write_char('*'),
                 PostfixToken::Plus => f.write_char('+'),
-            }
+            },
             Token::Pipe => f.write_char('|'),
             Token::EOF => f.write_str("<EOF>"),
         }

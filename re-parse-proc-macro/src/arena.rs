@@ -14,9 +14,12 @@ impl<T> Arena<T> {
         self.nodes.push(node);
         ArenaIndex::new(index)
     }
-    
+
     pub fn iter(&self) -> impl Iterator<Item = ArenaIndex<T>> + use<'_, T> {
-        self.nodes.iter().enumerate().map(|(i, _)| ArenaIndex::new(i))
+        self.nodes
+            .iter()
+            .enumerate()
+            .map(|(i, _)| ArenaIndex::new(i))
     }
 }
 
@@ -58,7 +61,9 @@ impl<T> ArenaIndex<T> {
 
 impl<T> Debug for ArenaIndex<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_tuple(&format!("ArenaIndex<{}>", std::any::type_name::<T>())).field(&self.index).finish()
+        f.debug_tuple(&format!("ArenaIndex<{}>", std::any::type_name::<T>()))
+            .field(&self.index)
+            .finish()
     }
 }
 
