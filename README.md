@@ -2,6 +2,9 @@
 
 A macro to parse simple inputs using regular expressions
 
+[![Documentation](https://img.shields.io/badge/Documentation-blue)](https://inky-developer.github.io/regex-parse/regex_parse/)
+[![Build status](https://github.com/Inky-developer/regex-parse/actions/workflows/check.yml/badge.svg)](https://github.com/Inky-developer/regex-parse/actions/workflows/check.yml)
+
 ## Installation
 
 ```shell
