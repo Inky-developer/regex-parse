@@ -1,6 +1,4 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
+pub use re_parse_proc_macro::re_parse;
 
 #[cfg(test)]
 mod tests {
@@ -8,7 +6,10 @@ mod tests {
 
     #[test]
     fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
+        let a: u32;
+        let b: u32;
+        re_parse!("{a} {b}", "1 2");
+        assert_eq!(a, 1);
+        assert_eq!(b, 2);
     }
 }
