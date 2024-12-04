@@ -11,7 +11,7 @@
     <span class="kw">let </span>year: u32;
     <span class="kw">let </span>month: u32;
     <span class="kw">let </span>day: u32;
-    <span class="macro">re_parse!</span>(<span class="string">"{year}-{month}-{day}"</span>, input);
+    <span class="macro">re_parse!</span>(<span class="string">"{year}\\-{month}\\-{day}"</span>, input);
     <span class="macro">assert_eq!</span>(year, <span class="number">2024</span>);
     <span class="macro">assert_eq!</span>(month, <span class="number">12</span>);
     <span class="macro">assert_eq!</span>(day, <span class="number">15</span>);
@@ -41,7 +41,7 @@ or: <code>a|b</code></li>
 parenthesis: <code>(ab)|(cd)</code></li>
 <li><input disabled="" type="checkbox" checked=""/>
 any character in group: <code>[abc]</code></li>
-<li><input disabled="" type="checkbox"/>
+<li><input disabled="" type="checkbox" checked=""/>
 any character in range: <code>[a-z]</code></li>
 <li><input disabled="" type="checkbox"/>
 any character: <code>.</code></li>
