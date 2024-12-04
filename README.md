@@ -15,7 +15,7 @@ cargo add --git https://github.com/Inky-developer/regex-parse regex-parse
 
 ### Parsing a date:
 ```rust
-use re_parse::re_parse;
+use regex_parse::re_parse;
 
 fn main() {
     let input = "2024-12-15";
@@ -31,7 +31,7 @@ fn main() {
 
 ### Using regular expressions:
 ```rust
-use re_parse::re_parse;
+use regex_parse::re_parse;
 
 fn main() {
     let inputs = ["1 2", "3      4"];
