@@ -49,7 +49,7 @@ fn main() {
 - [x] literal text: `abcdef`
 - [x] variables: `abc{var}def`
 - [x] or: `a|b`
-- [ ] parenthesis: `(ab)|(cd)`
+- [x] parenthesis: `(ab)|(cd)`
 - [ ] any character in group: `[abc]`
 - [ ] any character in range: `[a-z]`
 - [ ] any character: `.`

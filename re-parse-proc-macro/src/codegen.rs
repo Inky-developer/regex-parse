@@ -94,7 +94,7 @@ impl Codegen {
                     }
                 }
             }
-            (true, None) => quote! { break, },
+            (true, None) => quote! { break },
             (false, _) => quote! {panic!(#panic_message)},
         };
 

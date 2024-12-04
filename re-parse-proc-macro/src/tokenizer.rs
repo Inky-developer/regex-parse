@@ -6,9 +6,25 @@ pub enum Token {
     Char(char),
     LeftBrace,
     RightBrace,
+    LeftParenthesis,
+    RightParenthesis,
     Postfix(PostfixToken),
     Pipe,
     Eof,
+}
+
+impl Token {
+    /// Indicates whether this token may follow after a value to combine into an and-node
+    pub fn is_valid_after_value(self) -> bool {
+        match self {
+            Token::RightBrace
+            | Token::RightParenthesis
+            | Token::Postfix(_)
+            | Token::Pipe
+            | Token::Eof => false,
+            Token::Char(_) | Token::LeftBrace | Token::LeftParenthesis => true,
+        }
+    }
 }
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -24,6 +40,8 @@ impl Display for Token {
             Token::Char(c) => f.write_char(c),
             Token::LeftBrace => f.write_char('{'),
             Token::RightBrace => f.write_char('}'),
+            Token::LeftParenthesis => f.write_char('('),
+            Token::RightParenthesis => f.write_char(')'),
             Token::Postfix(postfix_token) => match postfix_token {
                 PostfixToken::QuestionMark => f.write_char('?'),
                 PostfixToken::Star => f.write_char('*'),
@@ -61,6 +79,8 @@ where
             }
             '{' => Some(Token::LeftBrace),
             '}' => Some(Token::RightBrace),
+            '(' => Some(Token::LeftParenthesis),
+            ')' => Some(Token::RightParenthesis),
             '?' => Some(Token::Postfix(PostfixToken::QuestionMark)),
             '*' => Some(Token::Postfix(PostfixToken::Star)),
             '+' => Some(Token::Postfix(PostfixToken::Plus)),

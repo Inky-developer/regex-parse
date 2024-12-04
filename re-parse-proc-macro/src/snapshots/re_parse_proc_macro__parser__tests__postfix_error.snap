@@ -1,0 +1,12 @@
+---
+source: re-parse-proc-macro/src/parser.rs
+expression: "parse(\"a?+\")"
+snapshot_kind: text
+---
+Err(
+    ExpectedEof {
+        got: Postfix(
+            Plus,
+        ),
+    },
+)

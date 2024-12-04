@@ -7,8 +7,12 @@ use thiserror::Error;
 pub enum ParseError {
     #[error("Unexpected token '}}'. Did you forget a '{{'?")]
     UnexpectedRightBrace,
+    #[error("Unexpected token '}}'. Did you forget a '{{'?")]
+    UnexpectedRightParenthesis,
     #[error("Unexpected postfix token: '{}'", got)]
     UnexpectedPostfixToken { got: Token },
+    #[error("Unexpected token '|'")]
+    UnexpectedBar,
     #[error("Unexpected token '{}'. Expected '{}'", got, expected)]
     UnexpectedToken { got: Token, expected: Token },
     #[error("Expected an identifier, got '{}'", got)]
@@ -17,6 +21,8 @@ pub enum ParseError {
     ExpectedChar { got: Token },
     #[error("Expected a postfix operator, got '{}'", got)]
     ExpectedPostfixOperator { got: Token },
+    #[error("Expected end of input, got '{}'", got)]
+    ExpectedEof { got: Token },
 }
 
 type Result<T> = std::result::Result<T, ParseError>;
@@ -38,7 +44,10 @@ where
             stack: vec![Vec::new()],
         };
 
-        parser.parse_root(&[])?;
+        parser.parse_regex()?;
+        if parser.peek() != Token::Eof {
+            return Err(ParseError::ExpectedEof { got: parser.peek() });
+        }
         let root_node = *parser
             .stack
             .last()
@@ -79,11 +88,12 @@ where
 
     fn push_node(&mut self, node: RegexNode) -> RegexNodeIndex {
         let node_idx = self.nodes.add(node);
-        self.stack
-            .last_mut()
-            .expect("Stack not empty")
-            .push(node_idx);
+        self.push_node_idx(node_idx);
         node_idx
+    }
+
+    fn push_node_idx(&mut self, idx: RegexNodeIndex) {
+        self.stack.last_mut().expect("Stack not empty").push(idx);
     }
 
     fn pop_row(&mut self) -> Vec<RegexNodeIndex> {
@@ -102,49 +112,75 @@ where
         self.stack.push(Vec::new());
     }
 
-    fn parse_root(&mut self, stop_tokens: &[Token]) -> Result<()> {
+    fn parse_regex(&mut self) -> Result<()> {
+        self.parse_or()
+    }
+
+    fn parse_or(&mut self) -> Result<()> {
         self.push_row();
+
         loop {
-            if self.peek() == Token::Eof || stop_tokens.contains(&self.peek()) {
+            self.parse_and()?;
+            if self.peek() == Token::Pipe {
+                self.consume();
+            } else {
                 break;
             }
-            self.parse_next()?;
         }
+
         let nodes = self.pop_row();
         match nodes.as_slice() {
-            [single] => self
-                .stack
-                .last_mut()
-                .expect("Stack not empty")
-                .push(*single),
+            [single] => self.push_node_idx(*single),
             _ => {
-                self.push_node(RegexNode::And(nodes));
+                self.push_node(RegexNode::Or(nodes));
             }
         };
 
         Ok(())
     }
 
-    fn parse_next(&mut self) -> Result<()> {
+    fn parse_and(&mut self) -> Result<()> {
+        self.push_row();
+
+        loop {
+            self.parse_value()?;
+            if !self.peek().is_valid_after_value() {
+                break;
+            }
+        }
+
+        let nodes = self.pop_row();
+        match nodes.as_slice() {
+            [single] => self.push_node_idx(*single),
+            _ => {
+                self.push_node(RegexNode::And(nodes));
+            }
+        }
+
+        Ok(())
+    }
+
+    fn parse_value(&mut self) -> Result<()> {
         match self.peek() {
             Token::Eof => Ok(()),
             Token::Char(_) => self.parse_char(),
             Token::RightBrace => Err(ParseError::UnexpectedRightBrace),
             Token::LeftBrace => self.parse_variable(),
-            Token::Pipe => self.parse_or(),
+            Token::LeftParenthesis => self.parse_parenthesis(),
+            Token::RightParenthesis => Err(ParseError::UnexpectedRightParenthesis),
+            Token::Pipe => Err(ParseError::UnexpectedBar),
             token @ Token::Postfix(_) => Err(ParseError::UnexpectedPostfixToken { got: token }),
         }
     }
 
-    fn parse_or(&mut self) -> Result<()> {
-        while self.peek() == Token::Pipe {
-            self.consume();
-            self.parse_root(&[Token::Pipe])?;
-        }
+    fn parse_parenthesis(&mut self) -> Result<()> {
+        self.expect(Token::LeftParenthesis)?;
+        self.parse_regex()?;
+        self.expect(Token::RightParenthesis)?;
 
-        let parts = self.pop_row();
-        self.push_row();
-        self.push_node(RegexNode::Or(parts));
+        if matches!(self.peek(), Token::Postfix(_)) {
+            self.parse_postfix()?;
+        }
 
         Ok(())
     }
@@ -233,7 +269,26 @@ mod tests {
     }
 
     #[test]
+    fn test_postfix_error() {
+        insta::assert_debug_snapshot!(parse("a?+"));
+        insta::assert_debug_snapshot!(parse("a**"));
+    }
+
+    #[test]
     fn test_or() {
         insta::assert_debug_snapshot!(parse("a?|b|c+d"));
+    }
+
+    #[test]
+    fn test_parenthesis() {
+        insta::assert_debug_snapshot!(parse("(ab)"));
+        insta::assert_debug_snapshot!(parse("(ab)|(cd)+"));
+        insta::assert_debug_snapshot!(parse("((a|b)c)*"));
+        insta::assert_debug_snapshot!(parse("(ab|cd)*"));
+    }
+
+    #[test]
+    fn test_empty() {
+        insta::assert_debug_snapshot!(parse(""));
     }
 }

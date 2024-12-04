@@ -1,0 +1,28 @@
+---
+source: re-parse-proc-macro/src/parser.rs
+expression: "parse(\"((a|b)c)*\")"
+snapshot_kind: text
+---
+Ok(
+    Many(
+        And(
+            Or(
+                Literal(
+                    Char(
+                        'a',
+                    ),
+                ),
+                Literal(
+                    Char(
+                        'b',
+                    ),
+                ),
+            ),
+            Literal(
+                Char(
+                    'c',
+                ),
+            ),
+        ),
+    ),
+)

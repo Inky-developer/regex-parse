@@ -14,6 +14,17 @@ fn test_parse_simple() {
 }
 
 #[test]
+fn test_empty() {
+    re_parse!("", "");
+}
+
+#[test]
+#[should_panic(expected = "Invalid character: 1")]
+fn test_empty_fail() {
+    re_parse!("", "1");
+}
+
+#[test]
 fn test_parse_text() {
     let var: u32;
     let var2: u32;
@@ -30,4 +41,25 @@ fn test_parse_regex() {
     re_parse!("A*{foo}B+{bar}", "AAA740BB5.0");
     assert_eq!(foo, 740);
     assert_eq!(bar, 5.0);
+}
+
+#[test]
+fn test_parse_regex_2() {
+    re_parse!("((Hello|World) )*", "Hello World World Hello Hello World ");
+}
+
+// FIXME: This test should probably be an error, at least when parsing into `Vec`s is supported
+#[test]
+fn test_parse_var_in_loop() {
+    let var: u32;
+    re_parse!("({var})*", "1234");
+    assert_eq!(var, 1234);
+}
+
+// FIXME: This should parse into a `Vec<u32>`
+#[test]
+fn test_parse_var_in_loop2() {
+    let var: u32;
+    re_parse!("({var},)*", "1,2,3,4,");
+    assert_eq!(var, 4);
 }
