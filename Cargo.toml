@@ -1,0 +1,13 @@
+[package]
+name = "re-parse"
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+members = [
+    ".",
+    "re-parse-proc-macro",
+]
+
+[dependencies]
+re-parse-proc-macro = { version = "0.1.0", path = "re-parse-proc-macro" }

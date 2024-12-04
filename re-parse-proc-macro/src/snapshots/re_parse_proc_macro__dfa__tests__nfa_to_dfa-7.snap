@@ -1,0 +1,112 @@
+---
+source: re-parse-proc-macro/src/dfa.rs
+expression: "parse(\"A{foo}B+{bar}\")"
+snapshot_kind: text
+---
+Ok(
+    Dfa {
+        root: ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
+            3,
+        ),
+        nodes: Arena {
+            nodes: [
+                DfaNode {
+                    is_accepting: false,
+                    variable: None,
+                    edges: DfaEdges {
+                        default: Some(
+                            ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
+                                4,
+                            ),
+                        ),
+                        edges: {
+                            'B': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
+                                0,
+                            ),
+                        },
+                    },
+                },
+                DfaNode {
+                    is_accepting: false,
+                    variable: None,
+                    edges: DfaEdges {
+                        default: None,
+                        edges: {
+                            'B': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
+                                0,
+                            ),
+                        },
+                    },
+                },
+                DfaNode {
+                    is_accepting: false,
+                    variable: None,
+                    edges: DfaEdges {
+                        default: Some(
+                            ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
+                                5,
+                            ),
+                        ),
+                        edges: {},
+                    },
+                },
+                DfaNode {
+                    is_accepting: false,
+                    variable: None,
+                    edges: DfaEdges {
+                        default: None,
+                        edges: {
+                            'A': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
+                                2,
+                            ),
+                        },
+                    },
+                },
+                DfaNode {
+                    is_accepting: true,
+                    variable: Some(
+                        "bar",
+                    ),
+                    edges: DfaEdges {
+                        default: Some(
+                            ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
+                                4,
+                            ),
+                        ),
+                        edges: {},
+                    },
+                },
+                DfaNode {
+                    is_accepting: false,
+                    variable: Some(
+                        "foo",
+                    ),
+                    edges: DfaEdges {
+                        default: Some(
+                            ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
+                                5,
+                            ),
+                        ),
+                        edges: {
+                            'B': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
+                                0,
+                            ),
+                        },
+                    },
+                },
+                DfaNode {
+                    is_accepting: false,
+                    variable: None,
+                    edges: DfaEdges {
+                        default: Some(
+                            ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
+                                4,
+                            ),
+                        ),
+                        edges: {},
+                    },
+                },
+            ],
+        },
+    },
+)

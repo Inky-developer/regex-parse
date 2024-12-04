@@ -1,0 +1,7 @@
+error: proc macro panicked
+ --> tests/compile_fail/duplicate_variable.rs:5:5
+  |
+5 |     re_parse!("{var}B{var}", "111B222");
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = help: message: (TODO MAKE ERROR) Variable "var" is already declared

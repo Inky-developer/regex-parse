@@ -1,0 +1,36 @@
+---
+source: re-parse-proc-macro/src/nfa.rs
+expression: "parse(\"A\")"
+snapshot_kind: text
+---
+Ok(
+    Nfa {
+        root: ArenaIndex<re_parse_proc_macro::nfa::NfaNode>(
+            0,
+        ),
+        nodes: Arena {
+            nodes: [
+                NfaNode {
+                    edges: [
+                        ArenaIndex<re_parse_proc_macro::nfa::NfaNode>(
+                            1,
+                        ),
+                    ],
+                    edge_kind: Epsilon,
+                    kind: Simple,
+                    is_accepting: false,
+                },
+                NfaNode {
+                    edges: [],
+                    edge_kind: Pattern(
+                        Char(
+                            'A',
+                        ),
+                    ),
+                    kind: Simple,
+                    is_accepting: true,
+                },
+            ],
+        },
+    },
+)

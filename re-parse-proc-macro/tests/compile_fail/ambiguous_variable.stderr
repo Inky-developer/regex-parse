@@ -1,0 +1,7 @@
+error: proc macro panicked
+ --> tests/compile_fail/ambiguous_variable.rs:4:5
+  |
+4 |     re_parse!("Foo{variable}B*{other_variable}C", "Foo111B222C")
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = help: message: (TODO THROW ERROR) ambiguous variables: variable collides with other_variable

@@ -1,0 +1,14 @@
+---
+source: re-parse-proc-macro/src/parser.rs
+expression: "parse(\"a+\")"
+snapshot_kind: text
+---
+Ok(
+    OneOrMore(
+        Literal(
+            Char(
+                'a',
+            ),
+        ),
+    ),
+)

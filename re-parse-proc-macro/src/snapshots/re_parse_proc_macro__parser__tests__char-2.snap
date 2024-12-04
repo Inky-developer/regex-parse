@@ -1,0 +1,24 @@
+---
+source: re-parse-proc-macro/src/parser.rs
+expression: "parse(\"abc\")"
+snapshot_kind: text
+---
+Ok(
+    And(
+        Literal(
+            Char(
+                'a',
+            ),
+        ),
+        Literal(
+            Char(
+                'b',
+            ),
+        ),
+        Literal(
+            Char(
+                'c',
+            ),
+        ),
+    ),
+)
