@@ -22,7 +22,7 @@ fn main() {
     let year: u32;
     let month: u32;
     let day: u32;
-    re_parse!("{year}-{month}-{day}", input);
+    re_parse!("{year}\\-{month}\\-{day}", input);
     assert_eq!(year, 2024);
     assert_eq!(month, 12);
     assert_eq!(day, 15);
@@ -51,7 +51,7 @@ fn main() {
 - [x] or: `a|b`
 - [x] parenthesis: `(ab)|(cd)`
 - [x] any character in group: `[abc]`
-- [ ] any character in range: `[a-z]`
+- [x] any character in range: `[a-z]`
 - [ ] any character: `.`
 - [ ] any whitespace: `\s`
 - [ ] any digit: `\d`

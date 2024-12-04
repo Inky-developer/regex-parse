@@ -1,0 +1,41 @@
+---
+source: re-parse-proc-macro/src/parser.rs
+expression: "parse(\"[a-z1234A-Z]\")"
+snapshot_kind: text
+---
+Ok(
+    Or(
+        Literal(
+            Range(
+                'a',
+                'z',
+            ),
+        ),
+        Literal(
+            Char(
+                '1',
+            ),
+        ),
+        Literal(
+            Char(
+                '2',
+            ),
+        ),
+        Literal(
+            Char(
+                '3',
+            ),
+        ),
+        Literal(
+            Char(
+                '4',
+            ),
+        ),
+        Literal(
+            Range(
+                'A',
+                'Z',
+            ),
+        ),
+    ),
+)

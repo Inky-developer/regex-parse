@@ -11,6 +11,8 @@ pub enum ParseError {
     UnexpectedRightParenthesis,
     #[error("Unexpected token ']'. Did you forget a '['?")]
     UnexpectedRightBracket,
+    #[error("Unexpected token '-'. It is currently only supported in a group: `[a-z]`")]
+    UnexpectedMinus,
     #[error("Unexpected postfix token: '{}'", got)]
     UnexpectedPostfixToken { got: Token },
     #[error("Unexpected token '|'")]
@@ -172,6 +174,7 @@ where
             Token::RightParenthesis => Err(ParseError::UnexpectedRightParenthesis),
             Token::LeftBracket => self.parse_group(),
             Token::RightBracket => Err(ParseError::UnexpectedRightBracket),
+            Token::Minus => Err(ParseError::UnexpectedMinus),
             Token::Pipe => Err(ParseError::UnexpectedBar),
             token @ Token::Postfix(_) => Err(ParseError::UnexpectedPostfixToken { got: token }),
         }
@@ -191,14 +194,29 @@ where
 
     fn parse_group_inner(&mut self) -> Result<()> {
         let mut chars = Vec::new();
-        while matches!(self.peek(), Token::Char(_)) {
-            let Token::Char(char) = self.consume() else {
-                break;
-            };
-            chars.push(self.nodes.add(RegexNode::Literal(RegexPattern::Char(char))));
+        while let Token::Char(char) = self.peek() {
+            self.consume();
+            if self.peek() == Token::Minus {
+                self.consume();
+                let Token::Char(final_char) = self.peek() else {
+                    return Err(ParseError::ExpectedChar { got: self.peek() });
+                };
+                self.consume();
+                chars.push(
+                    self.nodes
+                        .add(RegexNode::Literal(RegexPattern::Range(char, final_char))),
+                )
+            } else {
+                chars.push(self.nodes.add(RegexNode::Literal(RegexPattern::Char(char))));
+            }
         }
 
-        self.push_node(RegexNode::Or(chars));
+        match chars.as_slice() {
+            [single] => self.push_node_idx(*single),
+            _ => {
+                self.push_node(RegexNode::Or(chars));
+            }
+        }
 
         Ok(())
     }
@@ -328,5 +346,11 @@ mod tests {
         insta::assert_debug_snapshot!(parse("[ABC]"));
         insta::assert_debug_snapshot!(parse("[ABC]|[DEF]"));
         insta::assert_debug_snapshot!(parse("a[ABC]*e"));
+    }
+
+    #[test]
+    fn test_range() {
+        insta::assert_debug_snapshot!(parse("[a-z]"));
+        insta::assert_debug_snapshot!(parse("[a-z1234A-Z]"));
     }
 }

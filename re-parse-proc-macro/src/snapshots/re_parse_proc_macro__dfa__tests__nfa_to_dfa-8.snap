@@ -1,0 +1,48 @@
+---
+source: re-parse-proc-macro/src/dfa.rs
+expression: "parse(\"[a-e]\")"
+snapshot_kind: text
+---
+Ok(
+    Dfa {
+        root: ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
+            1,
+        ),
+        nodes: Arena {
+            nodes: [
+                DfaNode {
+                    is_accepting: true,
+                    variable: None,
+                    edges: DfaEdges {
+                        default: None,
+                        edges: {},
+                    },
+                },
+                DfaNode {
+                    is_accepting: false,
+                    variable: None,
+                    edges: DfaEdges {
+                        default: None,
+                        edges: {
+                            'e': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
+                                0,
+                            ),
+                            'b': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
+                                0,
+                            ),
+                            'd': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
+                                0,
+                            ),
+                            'a': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
+                                0,
+                            ),
+                            'c': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
+                                0,
+                            ),
+                        },
+                    },
+                },
+            ],
+        },
+    },
+)

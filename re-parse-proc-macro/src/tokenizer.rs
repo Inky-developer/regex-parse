@@ -10,6 +10,7 @@ pub enum Token {
     RightParenthesis,
     LeftBracket,
     RightBracket,
+    Minus,
     Postfix(PostfixToken),
     Pipe,
     Eof,
@@ -24,6 +25,7 @@ impl Token {
             | Token::RightBracket
             | Token::Postfix(_)
             | Token::Pipe
+            | Token::Minus
             | Token::Eof => false,
             Token::Char(_) | Token::LeftBrace | Token::LeftParenthesis | Token::LeftBracket => true,
         }
@@ -47,6 +49,7 @@ impl Display for Token {
             Token::RightParenthesis => f.write_char(')'),
             Token::LeftBracket => f.write_char('['),
             Token::RightBracket => f.write_char(']'),
+            Token::Minus => f.write_char('-'),
             Token::Postfix(postfix_token) => match postfix_token {
                 PostfixToken::QuestionMark => f.write_char('?'),
                 PostfixToken::Star => f.write_char('*'),
@@ -88,6 +91,7 @@ where
             ')' => Some(Token::RightParenthesis),
             '[' => Some(Token::LeftBracket),
             ']' => Some(Token::RightBracket),
+            '-' => Some(Token::Minus),
             '?' => Some(Token::Postfix(PostfixToken::QuestionMark)),
             '*' => Some(Token::Postfix(PostfixToken::Star)),
             '+' => Some(Token::Postfix(PostfixToken::Plus)),

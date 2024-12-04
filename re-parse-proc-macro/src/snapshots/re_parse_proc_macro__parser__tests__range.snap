@@ -1,0 +1,13 @@
+---
+source: re-parse-proc-macro/src/parser.rs
+expression: "parse(\"[a-z]\")"
+snapshot_kind: text
+---
+Ok(
+    Literal(
+        Range(
+            'a',
+            'z',
+        ),
+    ),
+)

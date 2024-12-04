@@ -201,6 +201,11 @@ impl DfaEdges {
         for (edge_pattern, target_idx) in edges.iter().copied() {
             match edge_pattern {
                 RegexPattern::Char(char) => edge_map.entry(char).or_default().push(target_idx),
+                RegexPattern::Range(start, end) => {
+                    for char in start..=end {
+                        edge_map.entry(char).or_default().push(target_idx);
+                    }
+                }
                 RegexPattern::AnyChar => default_edges.push(target_idx),
             }
         }
@@ -247,6 +252,7 @@ mod tests {
         insta::assert_debug_snapshot!(parse("A?b*c"));
         insta::assert_debug_snapshot!(parse("{foo}"));
         insta::assert_debug_snapshot!(parse("A{foo}B+{bar}"));
+        insta::assert_debug_snapshot!(parse("[a-e]"));
     }
 
     #[test]

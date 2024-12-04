@@ -70,3 +70,10 @@ fn test_group() {
         re_parse!("[ABC]|[DEF]", input)
     }
 }
+
+#[test]
+fn test_group_range() {
+    for input in ["A", "B", "C", "D", "E", "F"] {
+        re_parse!("[A-F]", input)
+    }
+}

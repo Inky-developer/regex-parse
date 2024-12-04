@@ -56,6 +56,7 @@ pub enum RegexNode {
 #[derive(Debug, Clone, Copy)]
 pub enum RegexPattern {
     Char(char),
+    Range(char, char),
     AnyChar,
 }
 
@@ -93,6 +94,7 @@ impl Display for RegexDisplay<'_> {
             }
             RegexNode::Literal(pat) => match pat {
                 RegexPattern::Char(char) => f.write_char(*char)?,
+                RegexPattern::Range(start, end) => write!(f, "{}-{}", start, end)?,
                 RegexPattern::AnyChar => f.write_char('.')?,
             },
             RegexNode::Variable(var) => write!(f, "{{{var}}}")?,
