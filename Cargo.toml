@@ -1,7 +1,12 @@
 [package]
-name = "re-parse"
+name = "regex-parse"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
+description = "A proc-macro that parses using regular expressions and extracts variables"
+repository = "https://github.com/Inky-developer/regex-parse"
+keywords = ["parsing", "proc-macro", "regular-expression", "regex"]
+categories = ["parsing"]
 
 [workspace]
 members = [

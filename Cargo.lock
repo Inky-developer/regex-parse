@@ -130,13 +130,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "re-parse"
-version = "0.1.0"
-dependencies = [
- "re-parse-proc-macro",
-]
-
-[[package]]
 name = "re-parse-proc-macro"
 version = "0.1.0"
 dependencies = [
@@ -147,6 +140,13 @@ dependencies = [
  "syn",
  "thiserror",
  "trybuild",
+]
+
+[[package]]
+name = "regex-parse"
+version = "0.1.0"
+dependencies = [
+ "re-parse-proc-macro",
 ]
 
 [[package]]

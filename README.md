@@ -5,7 +5,7 @@ A macro to parse simple inputs using regular expressions
 ## Installation
 
 ```shell
-cargo add --git https://github.com/Inky-developer/regex-parse re-parse
+cargo add --git https://github.com/Inky-developer/regex-parse regex-parse
 ```
 
 ## Example
