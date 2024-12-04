@@ -1,3 +1,6 @@
+//! For detailed documentation, look at [re_parse]
+#![doc=include_str!("../README.md")]
+
 pub use re_parse_proc_macro::re_parse;
 
 #[cfg(test)]

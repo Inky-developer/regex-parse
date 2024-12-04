@@ -34,6 +34,26 @@ impl Parse for ReParseInput {
     }
 }
 
+/// The main macro of this crate, which parses strings using regular expressions and can extract variables.
+///
+/// # Usage
+/// `re_parse!(pattern: StrLiteral, value: &str);`
+///
+/// Any variables contained in `pattern` will be set after the macro has run.
+/// For now, the macro will panic if the input cannot be parsed (TODO: Return error)
+///
+/// # Example
+/// ```rust
+/// # use re_parse_proc_macro::re_parse;
+/// let name: String;
+/// let score: f32;
+/// re_parse!("The score of {name} is {score}", "The score of user is 55.8");
+/// assert_eq!(name, "user");
+/// assert_eq!(score, 55.8);
+/// ```
+///
+/// # Efficiency
+/// The macro compiles the pattern into a state-machine which executes in linear time, so it should be very efficient.
 #[proc_macro]
 pub fn re_parse(input: TokenStream) -> TokenStream {
     let ReParseInput { regex, expression } = parse_macro_input!(input as ReParseInput);
