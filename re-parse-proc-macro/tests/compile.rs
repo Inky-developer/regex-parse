@@ -22,7 +22,6 @@ fn test_parse_text() {
     assert_eq!(var, 1);
     assert_eq!(var2, 2);
 }
-
 #[test]
 fn test_parse_regex() {
     let foo: u32;
