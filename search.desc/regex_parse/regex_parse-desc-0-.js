@@ -1,0 +1,1 @@
+searchState.loadedDescShard("regex_parse", 0, "For detailed documentation, look at re_parse\nThe main macro of this crate, which parses strings using …")

@@ -1,0 +1,70 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="For detailed documentation, look at re_parse"><title>regex_parse - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="regex_parse" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0 (90b35a623 2024-11-26)" data-channel="1.83.0" data-search-js="search-f0d225181b97f9a4.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle" title="show sidebar"></button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../regex_parse/index.html">regex_<wbr>parse</a><span class="version">0.1.0</span></h2></div><div class="sidebar-elems"><ul class="block"><li><a id="all-types" href="all.html">All Items</a></li></ul><section id="rustdoc-toc"><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#regex-parse" title="Regex-Parse">Regex-Parse</a><ul><li><a href="#installation" title="Installation">Installation</a></li><li><a href="#example" title="Example">Example</a></li><li><a href="#regex-features" title="Regex Features">Regex Features</a></li><li><a href="#missing-features" title="Missing Features">Missing Features</a></li></ul></li></ul><h3><a href="#macros">Crate Items</a></h3><ul class="block"><li><a href="#macros" title="Macros">Macros</a></li></ul></section><div id="rustdoc-modnav"></div></div></nav><div class="sidebar-resizer"></div><main><div class="width-limiter"><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1>Crate <span>regex_parse</span><button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../src/regex_parse/lib.rs.html#1-42">source</a> </span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>For detailed documentation, look at <a href="macro.re_parse.html" title="macro regex_parse::re_parse">re_parse</a></p>
+<h2 id="regex-parse"><a class="doc-anchor" href="#regex-parse">§</a>Regex-Parse</h2>
+<p>A macro to parse simple inputs using regular expressions</p>
+<h3 id="installation"><a class="doc-anchor" href="#installation">§</a>Installation</h3><div class="example-wrap"><pre class="language-shell"><code>cargo add --git https://github.com/Inky-developer/regex-parse regex-parse</code></pre></div><h3 id="example"><a class="doc-anchor" href="#example">§</a>Example</h3><h4 id="parsing-a-date"><a class="doc-anchor" href="#parsing-a-date">§</a>Parsing a date:</h4>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>re_parse::re_parse;
+
+<span class="kw">fn </span>main() {
+    <span class="kw">let </span>input = <span class="string">"2024-12-15"</span>;
+    <span class="kw">let </span>year: u32;
+    <span class="kw">let </span>month: u32;
+    <span class="kw">let </span>day: u32;
+    <span class="macro">re_parse!</span>(<span class="string">"{year}-{month}-{day}"</span>, input);
+    <span class="macro">assert_eq!</span>(year, <span class="number">2024</span>);
+    <span class="macro">assert_eq!</span>(month, <span class="number">12</span>);
+    <span class="macro">assert_eq!</span>(day, <span class="number">15</span>);
+}</code></pre></div>
+<h4 id="using-regular-expressions"><a class="doc-anchor" href="#using-regular-expressions">§</a>Using regular expressions:</h4>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>re_parse::re_parse;
+
+<span class="kw">fn </span>main() {
+    <span class="kw">let </span>inputs = [<span class="string">"1 2"</span>, <span class="string">"3      4"</span>];
+    <span class="kw">let </span>parsed_inputs = inputs.map(|input| {
+        <span class="kw">let </span>first_number: u32;
+        <span class="kw">let </span>second_number: u32;
+        <span class="macro">re_parse!</span>(<span class="string">"{first_number} +{second_number}"</span>, input);
+        (first_number, second_number)
+    });
+    <span class="macro">assert_eq!</span>(parsed_inputs, [(<span class="number">1</span>, <span class="number">2</span>), (<span class="number">3</span>, <span class="number">4</span>)]);
+}</code></pre></div>
+<h3 id="regex-features"><a class="doc-anchor" href="#regex-features">§</a>Regex Features</h3>
+<ul>
+<li><input disabled="" type="checkbox" checked=""/>
+literal text: <code>abcdef</code></li>
+<li><input disabled="" type="checkbox" checked=""/>
+variables: <code>abc{var}def</code></li>
+<li><input disabled="" type="checkbox" checked=""/>
+or: <code>a|b</code></li>
+<li><input disabled="" type="checkbox"/>
+parenthesis: <code>(ab)|(cd)</code></li>
+<li><input disabled="" type="checkbox"/>
+any character in group: <code>[abc]</code></li>
+<li><input disabled="" type="checkbox"/>
+any character in range: <code>[a-z]</code></li>
+<li><input disabled="" type="checkbox"/>
+any character: <code>.</code></li>
+<li><input disabled="" type="checkbox"/>
+any whitespace: <code>\s</code></li>
+<li><input disabled="" type="checkbox"/>
+any digit: <code>\d</code></li>
+<li><input disabled="" type="checkbox"/>
+any word: <code>\w</code></li>
+<li><input disabled="" type="checkbox" checked=""/>
+zero or one: <code>a?</code></li>
+<li><input disabled="" type="checkbox" checked=""/>
+zero or more: <code>a*</code></li>
+<li><input disabled="" type="checkbox" checked=""/>
+one or more: <code>a+</code></li>
+<li><input disabled="" type="checkbox"/>
+exactly n: <code>a{3}</code></li>
+<li><input disabled="" type="checkbox"/>
+n or more: <code>a{3,}</code></li>
+<li><input disabled="" type="checkbox"/>
+between n and m: <code>a{3,6}</code></li>
+</ul>
+<h3 id="missing-features"><a class="doc-anchor" href="#missing-features">§</a>Missing Features</h3>
+<ul>
+<li>Parsing into <code>Vec</code>s: <code>({some_variable},)*</code></li>
+<li>Support for more regex features</li>
+</ul>
+</div></details><h2 id="macros" class="section-header">Macros<a href="#macros" class="anchor">§</a></h2><ul class="item-table"><li><div class="item-name"><a class="macro" href="macro.re_parse.html" title="macro regex_parse::re_parse">re_<wbr>parse</a></div><div class="desc docblock-short">The main macro of this crate, which parses strings using regular expressions and can extract variables.</div></li></ul></section></div></main></body></html>
