@@ -1,0 +1,35 @@
+---
+source: re-parse-proc-macro/src/parser.rs
+expression: "parse(\"a?|b|c+d\")"
+snapshot_kind: text
+---
+Ok(
+    Or(
+        ZeroOrOne(
+            Literal(
+                Char(
+                    'a',
+                ),
+            ),
+        ),
+        Literal(
+            Char(
+                'b',
+            ),
+        ),
+        And(
+            OneOrMore(
+                Literal(
+                    Char(
+                        'c',
+                    ),
+                ),
+            ),
+            Literal(
+                Char(
+                    'd',
+                ),
+            ),
+        ),
+    ),
+)

@@ -1,0 +1,38 @@
+---
+source: re-parse-proc-macro/src/parser.rs
+expression: "parse(\"a[ABC]*e\")"
+snapshot_kind: text
+---
+Ok(
+    And(
+        Literal(
+            Char(
+                'a',
+            ),
+        ),
+        Many(
+            Or(
+                Literal(
+                    Char(
+                        'A',
+                    ),
+                ),
+                Literal(
+                    Char(
+                        'B',
+                    ),
+                ),
+                Literal(
+                    Char(
+                        'C',
+                    ),
+                ),
+            ),
+        ),
+        Literal(
+            Char(
+                'e',
+            ),
+        ),
+    ),
+)

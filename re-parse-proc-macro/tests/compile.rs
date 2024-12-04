@@ -63,3 +63,10 @@ fn test_parse_var_in_loop2() {
     re_parse!("({var},)*", "1,2,3,4,");
     assert_eq!(var, 4);
 }
+
+#[test]
+fn test_group() {
+    for input in ["A", "B", "C", "D", "E", "F"] {
+        re_parse!("[ABC]|[DEF]", input)
+    }
+}

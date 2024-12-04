@@ -7,8 +7,10 @@ use thiserror::Error;
 pub enum ParseError {
     #[error("Unexpected token '}}'. Did you forget a '{{'?")]
     UnexpectedRightBrace,
-    #[error("Unexpected token '}}'. Did you forget a '{{'?")]
+    #[error("Unexpected token ')'. Did you forget a '('?")]
     UnexpectedRightParenthesis,
+    #[error("Unexpected token ']'. Did you forget a '['?")]
+    UnexpectedRightBracket,
     #[error("Unexpected postfix token: '{}'", got)]
     UnexpectedPostfixToken { got: Token },
     #[error("Unexpected token '|'")]
@@ -168,9 +170,37 @@ where
             Token::LeftBrace => self.parse_variable(),
             Token::LeftParenthesis => self.parse_parenthesis(),
             Token::RightParenthesis => Err(ParseError::UnexpectedRightParenthesis),
+            Token::LeftBracket => self.parse_group(),
+            Token::RightBracket => Err(ParseError::UnexpectedRightBracket),
             Token::Pipe => Err(ParseError::UnexpectedBar),
             token @ Token::Postfix(_) => Err(ParseError::UnexpectedPostfixToken { got: token }),
         }
+    }
+
+    fn parse_group(&mut self) -> Result<()> {
+        self.expect(Token::LeftBracket)?;
+        self.parse_group_inner()?;
+        self.expect(Token::RightBracket)?;
+
+        if matches!(self.peek(), Token::Postfix(_)) {
+            self.parse_postfix()?;
+        }
+
+        Ok(())
+    }
+
+    fn parse_group_inner(&mut self) -> Result<()> {
+        let mut chars = Vec::new();
+        while matches!(self.peek(), Token::Char(_)) {
+            let Token::Char(char) = self.consume() else {
+                break;
+            };
+            chars.push(self.nodes.add(RegexNode::Literal(RegexPattern::Char(char))));
+        }
+
+        self.push_node(RegexNode::Or(chars));
+
+        Ok(())
     }
 
     fn parse_parenthesis(&mut self) -> Result<()> {
@@ -276,6 +306,7 @@ mod tests {
 
     #[test]
     fn test_or() {
+        insta::assert_debug_snapshot!(parse("a|b"));
         insta::assert_debug_snapshot!(parse("a?|b|c+d"));
     }
 
@@ -290,5 +321,12 @@ mod tests {
     #[test]
     fn test_empty() {
         insta::assert_debug_snapshot!(parse(""));
+    }
+
+    #[test]
+    fn test_group() {
+        insta::assert_debug_snapshot!(parse("[ABC]"));
+        insta::assert_debug_snapshot!(parse("[ABC]|[DEF]"));
+        insta::assert_debug_snapshot!(parse("a[ABC]*e"));
     }
 }

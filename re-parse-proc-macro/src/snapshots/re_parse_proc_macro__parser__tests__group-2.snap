@@ -1,0 +1,43 @@
+---
+source: re-parse-proc-macro/src/parser.rs
+expression: "parse(\"[ABC]|[DEF]\")"
+snapshot_kind: text
+---
+Ok(
+    Or(
+        Or(
+            Literal(
+                Char(
+                    'A',
+                ),
+            ),
+            Literal(
+                Char(
+                    'B',
+                ),
+            ),
+            Literal(
+                Char(
+                    'C',
+                ),
+            ),
+        ),
+        Or(
+            Literal(
+                Char(
+                    'D',
+                ),
+            ),
+            Literal(
+                Char(
+                    'E',
+                ),
+            ),
+            Literal(
+                Char(
+                    'F',
+                ),
+            ),
+        ),
+    ),
+)

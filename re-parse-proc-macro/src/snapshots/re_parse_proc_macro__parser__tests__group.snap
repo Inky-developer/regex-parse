@@ -1,18 +1,23 @@
 ---
 source: re-parse-proc-macro/src/parser.rs
-expression: "parse(\"a|b\")"
+expression: "parse(\"[ABC]\")"
 snapshot_kind: text
 ---
 Ok(
     Or(
         Literal(
             Char(
-                'a',
+                'A',
             ),
         ),
         Literal(
             Char(
-                'b',
+                'B',
+            ),
+        ),
+        Literal(
+            Char(
+                'C',
             ),
         ),
     ),

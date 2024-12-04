@@ -50,7 +50,7 @@ fn main() {
 - [x] variables: `abc{var}def`
 - [x] or: `a|b`
 - [x] parenthesis: `(ab)|(cd)`
-- [ ] any character in group: `[abc]`
+- [x] any character in group: `[abc]`
 - [ ] any character in range: `[a-z]`
 - [ ] any character: `.`
 - [ ] any whitespace: `\s`

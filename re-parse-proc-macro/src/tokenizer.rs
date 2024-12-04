@@ -8,6 +8,8 @@ pub enum Token {
     RightBrace,
     LeftParenthesis,
     RightParenthesis,
+    LeftBracket,
+    RightBracket,
     Postfix(PostfixToken),
     Pipe,
     Eof,
@@ -19,10 +21,11 @@ impl Token {
         match self {
             Token::RightBrace
             | Token::RightParenthesis
+            | Token::RightBracket
             | Token::Postfix(_)
             | Token::Pipe
             | Token::Eof => false,
-            Token::Char(_) | Token::LeftBrace | Token::LeftParenthesis => true,
+            Token::Char(_) | Token::LeftBrace | Token::LeftParenthesis | Token::LeftBracket => true,
         }
     }
 }
@@ -42,6 +45,8 @@ impl Display for Token {
             Token::RightBrace => f.write_char('}'),
             Token::LeftParenthesis => f.write_char('('),
             Token::RightParenthesis => f.write_char(')'),
+            Token::LeftBracket => f.write_char('['),
+            Token::RightBracket => f.write_char(']'),
             Token::Postfix(postfix_token) => match postfix_token {
                 PostfixToken::QuestionMark => f.write_char('?'),
                 PostfixToken::Star => f.write_char('*'),
@@ -81,6 +86,8 @@ where
             '}' => Some(Token::RightBrace),
             '(' => Some(Token::LeftParenthesis),
             ')' => Some(Token::RightParenthesis),
+            '[' => Some(Token::LeftBracket),
+            ']' => Some(Token::RightBracket),
             '?' => Some(Token::Postfix(PostfixToken::QuestionMark)),
             '*' => Some(Token::Postfix(PostfixToken::Star)),
             '+' => Some(Token::Postfix(PostfixToken::Plus)),
