@@ -27,7 +27,7 @@ struct FloodFillIter<'a, T: FloodFill> {
     visited_nodes: Set<T::Item>,
 }
 
-impl<'a, T> Iterator for FloodFillIter<'a, T>
+impl<T> Iterator for FloodFillIter<'_, T>
 where
     T: FloodFill,
     T::Item: Eq + Hash + Clone,
@@ -35,9 +35,7 @@ where
     type Item = T::Item;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let Some(next) = self.pending_nodes.iter().next() else {
-            return None;
-        };
+        let next = self.pending_nodes.iter().next()?;
 
         let next = next.clone();
 

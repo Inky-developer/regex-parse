@@ -8,7 +8,7 @@ pub enum Token {
     RightBrace,
     Postfix(PostfixToken),
     Pipe,
-    EOF,
+    Eof,
 }
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -30,7 +30,7 @@ impl Display for Token {
                 PostfixToken::Plus => f.write_char('+'),
             },
             Token::Pipe => f.write_char('|'),
-            Token::EOF => f.write_str("<EOF>"),
+            Token::Eof => f.write_str("<EOF>"),
         }
     }
 }
@@ -52,9 +52,7 @@ where
     type Item = Token;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let Some(char) = self.chars.next() else {
-            return None;
-        };
+        let char = self.chars.next()?;
 
         match char {
             '\\' => {

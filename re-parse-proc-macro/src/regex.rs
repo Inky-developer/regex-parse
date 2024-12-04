@@ -73,7 +73,7 @@ impl RegexDisplay<'_> {
     }
 }
 
-impl<'arena> Display for RegexDisplay<'arena> {
+impl Display for RegexDisplay<'_> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let node = &self.arena[self.node_idx];
 
@@ -114,7 +114,7 @@ impl<'arena> Display for RegexDisplay<'arena> {
     }
 }
 
-impl<'arena> Debug for RegexDisplay<'arena> {
+impl Debug for RegexDisplay<'_> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let node = &self.arena[self.node_idx];
         match node {

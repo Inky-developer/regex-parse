@@ -84,7 +84,7 @@ impl DfaBuilder {
     }
 
     fn compute_group(&mut self, nfa: &Nfa, group: Vec<NfaIndex>) {
-        let edges = DfaEdges::from_nfa_group(self, &nfa, &group);
+        let edges = DfaEdges::from_nfa_group(self, nfa, &group);
         let is_accepting = group
             .iter()
             .copied()
@@ -128,7 +128,7 @@ fn get_non_epsilon_edges(nfa: &Nfa, group: &[NfaIndex]) -> Vec<(RegexPattern, Nf
         for edge_idx in &node.edges {
             let edge = &nfa.nodes[*edge_idx];
             if let NfaEdge::Pattern(pattern) = &edge.edge_kind {
-                edges.push((pattern.clone(), *edge_idx))
+                edges.push((*pattern, *edge_idx))
             }
         }
     }
@@ -194,7 +194,7 @@ pub struct DfaEdges {
 
 impl DfaEdges {
     fn from_nfa_group(dfa: &mut DfaBuilder, nfa: &Nfa, group: &[NfaIndex]) -> Self {
-        let edges = get_non_epsilon_edges(&nfa, &group);
+        let edges = get_non_epsilon_edges(nfa, group);
 
         let mut default_edges: Vec<NfaIndex> = Vec::new();
         let mut edge_map: Map<char, Vec<NfaIndex>> = Map::default();

@@ -58,7 +58,7 @@ where
     }
 
     fn consume(&mut self) -> Token {
-        self.source.next().unwrap_or(Token::EOF)
+        self.source.next().unwrap_or(Token::Eof)
     }
 
     fn expect(&mut self, token: Token) -> Result<()> {
@@ -74,7 +74,7 @@ where
     }
 
     fn peek(&mut self) -> Token {
-        self.source.peek().copied().unwrap_or(Token::EOF)
+        self.source.peek().copied().unwrap_or(Token::Eof)
     }
 
     fn push_node(&mut self, node: RegexNode) -> RegexNodeIndex {
@@ -105,7 +105,7 @@ where
     fn parse_root(&mut self, stop_tokens: &[Token]) -> Result<()> {
         self.push_row();
         loop {
-            if self.peek() == Token::EOF || stop_tokens.contains(&self.peek()) {
+            if self.peek() == Token::Eof || stop_tokens.contains(&self.peek()) {
                 break;
             }
             self.parse_next()?;
@@ -127,7 +127,7 @@ where
 
     fn parse_next(&mut self) -> Result<()> {
         match self.peek() {
-            Token::EOF => Ok(()),
+            Token::Eof => Ok(()),
             Token::Char(_) => self.parse_char(),
             Token::RightBrace => Err(ParseError::UnexpectedRightBrace),
             Token::LeftBrace => self.parse_variable(),
@@ -193,11 +193,8 @@ where
 
     fn parse_ident(&mut self) -> Result<String> {
         let mut ident = String::new();
-        loop {
-            match self.peek() {
-                Token::Char(char) => ident.push(char),
-                _ => break,
-            }
+        while let Token::Char(char) = self.peek() {
+            ident.push(char);
             self.consume();
         }
         if ident.is_empty() {

@@ -110,7 +110,7 @@ fn convert_regex_node(
             predecessor,
             NfaNode {
                 edges: Vec::new(),
-                edge_kind: NfaEdge::Pattern(pattern.clone()),
+                edge_kind: NfaEdge::Pattern(*pattern),
                 kind: NfaNodeKind::Simple,
                 is_accepting: false,
             },

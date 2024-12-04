@@ -194,7 +194,7 @@ impl Codegen {
         for node_idx in self.dfa.iter() {
             let node = &self.dfa.nodes[node_idx];
             if let Some(variable) = &node.variable {
-                variables.insert(Ident::new(&variable, Span::call_site()));
+                variables.insert(Ident::new(variable, Span::call_site()));
             }
         }
 
