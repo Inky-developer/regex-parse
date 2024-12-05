@@ -1,0 +1,39 @@
+---
+source: re-parse-proc-macro/src/parser.rs
+expression: "parse(\"[,.{}()]\")"
+snapshot_kind: text
+---
+Ok(
+    Or(
+        Literal(
+            Char(
+                ',',
+            ),
+        ),
+        Literal(
+            Char(
+                '.',
+            ),
+        ),
+        Literal(
+            Char(
+                '{',
+            ),
+        ),
+        Literal(
+            Char(
+                '}',
+            ),
+        ),
+        Literal(
+            Char(
+                '(',
+            ),
+        ),
+        Literal(
+            Char(
+                ')',
+            ),
+        ),
+    ),
+)

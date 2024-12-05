@@ -90,6 +90,24 @@ where
         self.source.peek().copied().unwrap_or(Token::Eof)
     }
 
+    /// Interprets the next token as a character in a `\[...\]` group
+    fn consume_as_char(&mut self) -> Result<char> {
+        fn single_char(input: &str) -> char {
+            let mut chars = input.chars();
+            let char = chars.next().expect("Input should not be empty");
+            assert!(
+                chars.next().is_none(),
+                "Input should have a single character only"
+            );
+            char
+        }
+        if matches!(self.peek(), Token::Eof | Token::RightBracket) {
+            return Err(ParseError::UnexpectedRightBracket);
+        };
+
+        Ok(single_char(&self.consume().to_string()))
+    }
+
     fn push_node(&mut self, node: RegexNode) -> RegexNodeIndex {
         let node_idx = self.nodes.add(node);
         self.push_node_idx(node_idx);
@@ -194,14 +212,10 @@ where
 
     fn parse_group_inner(&mut self) -> Result<()> {
         let mut chars = Vec::new();
-        while let Token::Char(char) = self.peek() {
-            self.consume();
+        while let Ok(char) = self.consume_as_char() {
             if self.peek() == Token::Minus {
                 self.consume();
-                let Token::Char(final_char) = self.peek() else {
-                    return Err(ParseError::ExpectedChar { got: self.peek() });
-                };
-                self.consume();
+                let final_char = self.consume_as_char()?;
                 chars.push(
                     self.nodes
                         .add(RegexNode::Literal(RegexPattern::Range(char, final_char))),
@@ -355,5 +369,13 @@ mod tests {
     fn test_range() {
         insta::assert_debug_snapshot!(parse("[a-z]"));
         insta::assert_debug_snapshot!(parse("[a-z1234A-Z]"));
+        insta::assert_debug_snapshot!(parse("[,.{}()]"));
+    }
+
+    #[test]
+    fn test_dot() {
+        insta::assert_debug_snapshot!(parse("a.c"));
+        insta::assert_debug_snapshot!(parse(".*."));
+        insta::assert_debug_snapshot!(parse("[.,]"));
     }
 }
