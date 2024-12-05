@@ -1,0 +1,63 @@
+---
+source: re-parse-proc-macro/src/nfa.rs
+expression: "parse(\".{var}.\")"
+snapshot_kind: text
+---
+Ok(
+    Nfa {
+        root: ArenaIndex<re_parse_proc_macro::nfa::NfaNode>(
+            0,
+        ),
+        nodes: Arena {
+            nodes: [
+                NfaNode {
+                    edges: [
+                        ArenaIndex<re_parse_proc_macro::nfa::NfaNode>(
+                            1,
+                        ),
+                    ],
+                    edge_kind: Epsilon,
+                    kind: Simple,
+                    is_accepting: false,
+                },
+                NfaNode {
+                    edges: [
+                        ArenaIndex<re_parse_proc_macro::nfa::NfaNode>(
+                            2,
+                        ),
+                    ],
+                    edge_kind: Pattern(
+                        AnyChar,
+                    ),
+                    kind: Simple,
+                    is_accepting: false,
+                },
+                NfaNode {
+                    edges: [
+                        ArenaIndex<re_parse_proc_macro::nfa::NfaNode>(
+                            2,
+                        ),
+                        ArenaIndex<re_parse_proc_macro::nfa::NfaNode>(
+                            3,
+                        ),
+                    ],
+                    edge_kind: Pattern(
+                        AnyCharLazy,
+                    ),
+                    kind: Variable(
+                        "var",
+                    ),
+                    is_accepting: false,
+                },
+                NfaNode {
+                    edges: [],
+                    edge_kind: Pattern(
+                        AnyChar,
+                    ),
+                    kind: Simple,
+                    is_accepting: true,
+                },
+            ],
+        },
+    },
+)

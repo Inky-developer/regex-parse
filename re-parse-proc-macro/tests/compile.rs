@@ -77,3 +77,15 @@ fn test_group_range() {
         re_parse!("[A-F]", input)
     }
 }
+
+#[test]
+fn test_dot() {
+    let var: u32;
+    re_parse!(".{var}.", "123");
+    assert_eq!(var, 2);
+}
+
+#[test]
+fn test_precedence() {
+    re_parse!("(abc|.)", "a");
+}

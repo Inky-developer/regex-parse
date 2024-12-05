@@ -91,14 +91,14 @@ impl DfaBuilder {
             .any(|nfa_idx| nfa.nodes[nfa_idx].is_accepting);
         let variable = self.compute_group_variable(nfa, &group);
 
-        (self.insert(
+        self.insert(
             group,
             DfaNode {
                 is_accepting,
                 variable,
                 edges,
             },
-        ));
+        );
     }
 
     fn compute_group_variable(&self, nfa: &Nfa, group: &[NfaIndex]) -> Option<String> {
@@ -197,6 +197,8 @@ impl DfaEdges {
         let edges = get_non_epsilon_edges(nfa, group);
 
         let mut default_edges: Vec<NfaIndex> = Vec::new();
+        let mut lazy_default_edges: Vec<NfaIndex> = Vec::new();
+
         let mut edge_map: Map<char, Vec<NfaIndex>> = Map::default();
         for (edge_pattern, target_idx) in edges.iter().copied() {
             match edge_pattern {
@@ -207,12 +209,23 @@ impl DfaEdges {
                     }
                 }
                 RegexPattern::AnyChar => default_edges.push(target_idx),
+                RegexPattern::AnyCharLazy => lazy_default_edges.push(target_idx),
             }
         }
 
-        for value in edge_map.values_mut() {
-            value.sort();
+        // Since a default edge can be any char, it also has to be added to each value in the edge map now.
+        for targets in edge_map.values_mut() {
+            targets.extend(default_edges.iter().copied());
+            targets.sort_unstable();
+            targets.dedup();
         }
+
+        // If there is a default_edge, it will overwrite the lazy-default edge completely.
+        if default_edges.is_empty() {
+            default_edges = lazy_default_edges;
+        }
+        default_edges.sort_unstable();
+        default_edges.dedup();
 
         let default_edge_idx = if default_edges.is_empty() {
             None
@@ -253,6 +266,7 @@ mod tests {
         insta::assert_debug_snapshot!(parse("{foo}"));
         insta::assert_debug_snapshot!(parse("A{foo}B+{bar}"));
         insta::assert_debug_snapshot!(parse("[a-e]"));
+        insta::assert_debug_snapshot!(parse(".{var}."));
     }
 
     #[test]

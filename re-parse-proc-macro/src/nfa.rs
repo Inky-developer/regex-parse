@@ -120,7 +120,7 @@ fn convert_regex_node(
                 predecessor,
                 NfaNode {
                     edges: Vec::new(),
-                    edge_kind: NfaEdge::Pattern(RegexPattern::AnyChar),
+                    edge_kind: NfaEdge::Pattern(RegexPattern::AnyCharLazy),
                     kind: NfaNodeKind::Variable(var.clone()),
                     is_accepting: false,
                 },
@@ -193,5 +193,6 @@ mod tests {
         insta::assert_debug_snapshot!(parse("A"));
         insta::assert_debug_snapshot!(parse("A|B|C"));
         insta::assert_debug_snapshot!(parse("A?b*c"));
+        insta::assert_debug_snapshot!(parse(".{var}."));
     }
 }

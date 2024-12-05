@@ -58,6 +58,14 @@ pub enum RegexPattern {
     Char(char),
     Range(char, char),
     AnyChar,
+    /// Matches every character, except those that were explicitly specified.
+    /// For example `(ABC|.)` (where `.` is [AnyChar]) matches the input `A`, because the `.`
+    /// matched. If the `.` would be [AnyCharLazy], the regex would not match the input `A`, because
+    /// the more specific patter `ABC` would take precedence.
+    ///
+    /// This is used for variables: `{var}` gets transformed into `.+`, where the `.` is lazy.
+    /// The reason this is done is to make it possible to match anything at all.
+    AnyCharLazy,
 }
 
 pub struct RegexDisplay<'arena> {
@@ -95,7 +103,7 @@ impl Display for RegexDisplay<'_> {
             RegexNode::Literal(pat) => match pat {
                 RegexPattern::Char(char) => f.write_char(*char)?,
                 RegexPattern::Range(start, end) => write!(f, "{}-{}", start, end)?,
-                RegexPattern::AnyChar => f.write_char('.')?,
+                RegexPattern::AnyChar | RegexPattern::AnyCharLazy => f.write_char('.')?,
             },
             RegexNode::Variable(var) => write!(f, "{{{var}}}")?,
             RegexNode::ZeroOrOne(node) => {

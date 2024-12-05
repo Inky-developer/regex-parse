@@ -1,0 +1,17 @@
+---
+source: re-parse-proc-macro/src/parser.rs
+expression: "parse(\".*.\")"
+snapshot_kind: text
+---
+Ok(
+    And(
+        Many(
+            Literal(
+                AnyChar,
+            ),
+        ),
+        Literal(
+            AnyChar,
+        ),
+    ),
+)

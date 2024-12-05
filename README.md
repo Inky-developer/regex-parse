@@ -52,7 +52,7 @@ fn main() {
 - [x] parenthesis: `(ab)|(cd)`
 - [x] any character in group: `[abc]`
 - [x] any character in range: `[a-z]`
-- [ ] any character: `.`
+- [x] any character: `.`
 - [ ] any whitespace: `\s`
 - [ ] any digit: `\d`
 - [ ] any word: `\w`

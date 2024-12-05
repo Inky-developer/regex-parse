@@ -4,6 +4,7 @@ use std::iter::Peekable;
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum Token {
     Char(char),
+    Dot,
     LeftBrace,
     RightBrace,
     LeftParenthesis,
@@ -27,7 +28,11 @@ impl Token {
             | Token::Pipe
             | Token::Minus
             | Token::Eof => false,
-            Token::Char(_) | Token::LeftBrace | Token::LeftParenthesis | Token::LeftBracket => true,
+            Token::Char(_)
+            | Token::Dot
+            | Token::LeftBrace
+            | Token::LeftParenthesis
+            | Token::LeftBracket => true,
         }
     }
 }
@@ -43,6 +48,7 @@ impl Display for Token {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match *self {
             Token::Char(c) => f.write_char(c),
+            Token::Dot => f.write_str("."),
             Token::LeftBrace => f.write_char('{'),
             Token::RightBrace => f.write_char('}'),
             Token::LeftParenthesis => f.write_char('('),
@@ -96,6 +102,7 @@ where
             '*' => Some(Token::Postfix(PostfixToken::Star)),
             '+' => Some(Token::Postfix(PostfixToken::Plus)),
             '|' => Some(Token::Pipe),
+            '.' => Some(Token::Dot),
             _ => Some(Token::Char(char)),
         }
     }

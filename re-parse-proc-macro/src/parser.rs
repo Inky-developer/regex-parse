@@ -167,7 +167,7 @@ where
     fn parse_value(&mut self) -> Result<()> {
         match self.peek() {
             Token::Eof => Ok(()),
-            Token::Char(_) => self.parse_char(),
+            Token::Char(_) | Token::Dot => self.parse_char(),
             Token::RightBrace => Err(ParseError::UnexpectedRightBrace),
             Token::LeftBrace => self.parse_variable(),
             Token::LeftParenthesis => self.parse_parenthesis(),
@@ -256,6 +256,9 @@ where
         match token {
             Token::Char(char) => {
                 self.push_node(RegexNode::Literal(RegexPattern::Char(char)));
+            }
+            Token::Dot => {
+                self.push_node(RegexNode::Literal(RegexPattern::AnyChar));
             }
             _ => return Err(ParseError::ExpectedChar { got: token }),
         }
