@@ -1,0 +1,29 @@
+---
+source: re-parse-proc-macro/src/parser.rs
+expression: "parse(\"\\\\s\")"
+snapshot_kind: text
+---
+Ok(
+    Or(
+        Literal(
+            Char(
+                '\r',
+            ),
+        ),
+        Literal(
+            Char(
+                '\n',
+            ),
+        ),
+        Literal(
+            Char(
+                '\t',
+            ),
+        ),
+        Literal(
+            Char(
+                ' ',
+            ),
+        ),
+    ),
+)

@@ -1,0 +1,32 @@
+---
+source: re-parse-proc-macro/src/parser.rs
+expression: "parse(\"\\\\w\")"
+snapshot_kind: text
+---
+Ok(
+    Or(
+        Literal(
+            Range(
+                'a',
+                'z',
+            ),
+        ),
+        Literal(
+            Range(
+                'A',
+                'Z',
+            ),
+        ),
+        Literal(
+            Range(
+                '0',
+                '9',
+            ),
+        ),
+        Literal(
+            Char(
+                '_',
+            ),
+        ),
+    ),
+)

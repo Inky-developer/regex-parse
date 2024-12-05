@@ -89,3 +89,10 @@ fn test_dot() {
 fn test_precedence() {
     re_parse!("(abc|.)", "a");
 }
+
+#[test]
+fn test_character_class() {
+    let a: String;
+    re_parse!("\\w+ {a}\\s?", "Hello World ");
+    assert_eq!(a, "World");
+}

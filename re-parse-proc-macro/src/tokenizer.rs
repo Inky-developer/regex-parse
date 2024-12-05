@@ -1,3 +1,4 @@
+use crate::regex::RegexPattern;
 use std::fmt::{Display, Write};
 use std::iter::Peekable;
 
@@ -5,6 +6,7 @@ use std::iter::Peekable;
 pub enum Token {
     Char(char),
     Dot,
+    CharacterClass(CharacterClass),
     LeftBrace,
     RightBrace,
     LeftParenthesis,
@@ -30,9 +32,39 @@ impl Token {
             | Token::Eof => false,
             Token::Char(_)
             | Token::Dot
+            | Token::CharacterClass(_)
             | Token::LeftBrace
             | Token::LeftParenthesis
             | Token::LeftBracket => true,
+        }
+    }
+}
+
+/// Perl character classes (e.g. `\d`, `\w`)
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+pub enum CharacterClass {
+    Whitespace,
+    Digit,
+    Word,
+}
+
+impl CharacterClass {
+    /// Returns a list of patterns that correspond to this character class if or-ed together
+    pub fn as_patterns(self) -> &'static [RegexPattern] {
+        match self {
+            CharacterClass::Whitespace => &[
+                RegexPattern::Char('\r'),
+                RegexPattern::Char('\n'),
+                RegexPattern::Char('\t'),
+                RegexPattern::Char(' '),
+            ],
+            CharacterClass::Digit => &[RegexPattern::Range('0', '9')],
+            CharacterClass::Word => &[
+                RegexPattern::Range('a', 'z'),
+                RegexPattern::Range('A', 'Z'),
+                RegexPattern::Range('0', '9'),
+                RegexPattern::Char('_'),
+            ],
         }
     }
 }
@@ -49,6 +81,11 @@ impl Display for Token {
         match *self {
             Token::Char(c) => f.write_char(c),
             Token::Dot => f.write_str("."),
+            Token::CharacterClass(class) => match class {
+                CharacterClass::Whitespace => f.write_str("\\s"),
+                CharacterClass::Digit => f.write_str("\\d"),
+                CharacterClass::Word => f.write_str("\\w"),
+            },
             Token::LeftBrace => f.write_char('{'),
             Token::RightBrace => f.write_char('}'),
             Token::LeftParenthesis => f.write_char('('),
@@ -89,7 +126,13 @@ where
         match char {
             '\\' => {
                 let next = self.chars.next().expect("Unterminated escape sequence");
-                Some(Token::Char(next))
+                let token = match next {
+                    's' => Token::CharacterClass(CharacterClass::Whitespace),
+                    'd' => Token::CharacterClass(CharacterClass::Digit),
+                    'w' => Token::CharacterClass(CharacterClass::Word),
+                    _ => Token::Char(next),
+                };
+                Some(token)
             }
             '{' => Some(Token::LeftBrace),
             '}' => Some(Token::RightBrace),

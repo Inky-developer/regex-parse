@@ -1,0 +1,13 @@
+---
+source: re-parse-proc-macro/src/parser.rs
+expression: "parse(\"\\\\d\")"
+snapshot_kind: text
+---
+Ok(
+    Literal(
+        Range(
+            '0',
+            '9',
+        ),
+    ),
+)

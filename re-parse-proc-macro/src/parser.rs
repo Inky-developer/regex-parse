@@ -185,7 +185,7 @@ where
     fn parse_value(&mut self) -> Result<()> {
         match self.peek() {
             Token::Eof => Ok(()),
-            Token::Char(_) | Token::Dot => self.parse_char(),
+            Token::Char(_) | Token::Dot | Token::CharacterClass(_) => self.parse_char(),
             Token::RightBrace => Err(ParseError::UnexpectedRightBrace),
             Token::LeftBrace => self.parse_variable(),
             Token::LeftParenthesis => self.parse_parenthesis(),
@@ -273,6 +273,20 @@ where
             }
             Token::Dot => {
                 self.push_node(RegexNode::Literal(RegexPattern::AnyChar));
+            }
+            Token::CharacterClass(class) => {
+                let patterns = class.as_patterns();
+                match patterns {
+                    [single] => self.push_node(RegexNode::Literal(*single)),
+                    _ => {
+                        let parts = patterns
+                            .iter()
+                            .copied()
+                            .map(|pat| self.nodes.add(RegexNode::Literal(pat)))
+                            .collect();
+                        self.push_node(RegexNode::Or(parts))
+                    }
+                };
             }
             _ => return Err(ParseError::ExpectedChar { got: token }),
         }
@@ -377,5 +391,12 @@ mod tests {
         insta::assert_debug_snapshot!(parse("a.c"));
         insta::assert_debug_snapshot!(parse(".*."));
         insta::assert_debug_snapshot!(parse("[.,]"));
+    }
+
+    #[test]
+    fn test_character_class() {
+        insta::assert_debug_snapshot!(parse("\\d"));
+        insta::assert_debug_snapshot!(parse("\\s"));
+        insta::assert_debug_snapshot!(parse("\\w"));
     }
 }

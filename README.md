@@ -52,10 +52,11 @@ fn main() {
 - [x] parenthesis: `(ab)|(cd)`
 - [x] any character in group: `[abc]`
 - [x] any character in range: `[a-z]`
+- [ ] any character not in group: `[^abc]`
 - [x] any character: `.`
-- [ ] any whitespace: `\s`
-- [ ] any digit: `\d`
-- [ ] any word: `\w`
+- [x] any whitespace: `\s`
+- [x] any digit: `\d`
+- [x] any word: `\w`
 - [x] zero or one: `a?`
 - [x] zero or more: `a*`
 - [x] one or more: `a+`
