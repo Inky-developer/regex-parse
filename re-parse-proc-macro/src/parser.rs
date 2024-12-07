@@ -401,6 +401,7 @@ mod tests {
         insta::assert_debug_snapshot!(parse("a.c"));
         insta::assert_debug_snapshot!(parse(".*."));
         insta::assert_debug_snapshot!(parse("[.,]"));
+        insta::assert_debug_snapshot!(parse(".+;"));
     }
 
     #[test]

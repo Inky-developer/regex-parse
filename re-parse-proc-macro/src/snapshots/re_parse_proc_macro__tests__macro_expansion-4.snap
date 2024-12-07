@@ -6,8 +6,8 @@ snapshot_kind: text
 fn main() {
     {
         enum __State {
-            State_0,
             State_1,
+            State_0,
         }
         let __initial_input = "A";
         let mut __input = __initial_input.char_indices();
@@ -16,8 +16,8 @@ fn main() {
         loop {
             let Some((__byte_index, __next_char)) = __input.next() else {
                 match __state {
-                    __State::State_0 => break,
                     __State::State_1 => break,
+                    __State::State_0 => break,
                 }
             };
             match __state {

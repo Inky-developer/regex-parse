@@ -53,6 +53,7 @@ fn test_parse_regex() {
 #[test]
 fn test_parse_regex_2() {
     re_parse!("((Hello|World) )*", "Hello World World Hello Hello World ");
+    re_parse!("A.*B.*;", "AAAAABBBB;");
 }
 
 #[test]

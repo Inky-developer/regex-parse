@@ -12,12 +12,6 @@ pub struct Nfa {
     pub nodes: NfaArena,
 }
 
-impl Nfa {
-    pub fn iter(&self) -> impl Iterator<Item = NfaIndex> + use<'_> {
-        <Self as FloodFill>::iter(self, self.root)
-    }
-}
-
 impl From<Regex> for Nfa {
     fn from(value: Regex) -> Self {
         let Regex { arena, root } = value;
@@ -197,5 +191,6 @@ mod tests {
         insta::assert_debug_snapshot!(parse("A|B|C"));
         insta::assert_debug_snapshot!(parse("A?b*c"));
         insta::assert_debug_snapshot!(parse(".{var}."));
+        insta::assert_debug_snapshot!(parse(".+;"));
     }
 }

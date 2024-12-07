@@ -1,0 +1,69 @@
+---
+source: re-parse-proc-macro/src/lib.rs
+expression: "dbg_re_parse!(\"A.*B.*;\", \"AAABBB;\")"
+snapshot_kind: text
+---
+fn main() {
+    {
+        enum __State {
+            State_1,
+            State_0,
+            State_3,
+            State_2,
+        }
+        let __initial_input = "AAABBB;";
+        let mut __input = __initial_input.char_indices();
+        let mut __variable_start = 0_usize;
+        let mut __state = __State::State_0;
+        loop {
+            let Some((__byte_index, __next_char)) = __input.next() else {
+                match __state {
+                    __State::State_1 => panic!("Unexpected end of input (State_1)"),
+                    __State::State_0 => panic!("Unexpected end of input (State_0)"),
+                    __State::State_3 => break,
+                    __State::State_2 => panic!("Unexpected end of input (State_2)"),
+                }
+            };
+            match __state {
+                __State::State_0 => {
+                    match __next_char {
+                        'A' => {
+                            __state = __State::State_1;
+                        }
+                        _ => panic!("Unexpected character {__next_char}. Expected 'A'"),
+                    }
+                }
+                __State::State_1 => {
+                    match __next_char {
+                        'B' => {
+                            __state = __State::State_2;
+                        }
+                        _ => {
+                            __state = __State::State_1;
+                        }
+                    }
+                }
+                __State::State_2 => {
+                    match __next_char {
+                        ';' => {
+                            __state = __State::State_3;
+                        }
+                        _ => {
+                            __state = __State::State_2;
+                        }
+                    }
+                }
+                __State::State_3 => {
+                    match __next_char {
+                        ';' => {
+                            __state = __State::State_3;
+                        }
+                        _ => {
+                            __state = __State::State_2;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

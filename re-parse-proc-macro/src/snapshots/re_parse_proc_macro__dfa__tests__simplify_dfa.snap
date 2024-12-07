@@ -6,7 +6,7 @@ snapshot_kind: text
 Ok(
     Dfa {
         root: ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-            12,
+            3,
         ),
         nodes: Arena {
             nodes: [
@@ -106,6 +106,24 @@ Ok(
                     edges: DfaEdges {
                         default: None,
                         edges: {
+                            'a': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
+                                0,
+                            ),
+                            'b': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
+                                0,
+                            ),
+                            'c': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
+                                0,
+                            ),
+                        },
+                    },
+                },
+                DfaNode {
+                    is_accepting: true,
+                    variable: None,
+                    edges: DfaEdges {
+                        default: None,
+                        edges: {
                             ' ': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
                                 0,
                             ),
@@ -212,149 +230,6 @@ Ok(
                                 0,
                             ),
                             '\t': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-                                0,
-                            ),
-                            'c': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-                                0,
-                            ),
-                        },
-                    },
-                },
-                DfaNode {
-                    is_accepting: true,
-                    variable: None,
-                    edges: DfaEdges {
-                        default: None,
-                        edges: {
-                            ' ': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-                                0,
-                            ),
-                            '\r': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-                                0,
-                            ),
-                            'b': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-                                0,
-                            ),
-                            '\n': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-                                0,
-                            ),
-                            'a': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-                                0,
-                            ),
-                            '\t': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-                                0,
-                            ),
-                            'c': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-                                0,
-                            ),
-                        },
-                    },
-                },
-                DfaNode {
-                    is_accepting: false,
-                    variable: None,
-                    edges: DfaEdges {
-                        default: None,
-                        edges: {
-                            ' ': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-                                0,
-                            ),
-                            '\r': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-                                0,
-                            ),
-                            '\n': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-                                0,
-                            ),
-                            '\t': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-                                0,
-                            ),
-                        },
-                    },
-                },
-                DfaNode {
-                    is_accepting: true,
-                    variable: None,
-                    edges: DfaEdges {
-                        default: None,
-                        edges: {
-                            ' ': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-                                0,
-                            ),
-                            '\r': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-                                0,
-                            ),
-                            'b': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-                                0,
-                            ),
-                            '\n': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-                                0,
-                            ),
-                            'a': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-                                0,
-                            ),
-                            '\t': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-                                0,
-                            ),
-                            'c': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-                                0,
-                            ),
-                        },
-                    },
-                },
-                DfaNode {
-                    is_accepting: false,
-                    variable: None,
-                    edges: DfaEdges {
-                        default: None,
-                        edges: {
-                            'a': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-                                0,
-                            ),
-                            'b': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-                                0,
-                            ),
-                            'c': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-                                0,
-                            ),
-                        },
-                    },
-                },
-                DfaNode {
-                    is_accepting: true,
-                    variable: None,
-                    edges: DfaEdges {
-                        default: None,
-                        edges: {},
-                    },
-                },
-                DfaNode {
-                    is_accepting: true,
-                    variable: None,
-                    edges: DfaEdges {
-                        default: None,
-                        edges: {
-                            'a': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-                                0,
-                            ),
-                            'b': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-                                0,
-                            ),
-                            'c': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-                                0,
-                            ),
-                        },
-                    },
-                },
-                DfaNode {
-                    is_accepting: true,
-                    variable: None,
-                    edges: DfaEdges {
-                        default: None,
-                        edges: {
-                            'a': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-                                0,
-                            ),
-                            'b': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
                                 0,
                             ),
                             'c': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(

@@ -23,9 +23,8 @@ impl Dfa {
 impl From<Nfa> for Dfa {
     fn from(nfa: Nfa) -> Self {
         let mut builder = DfaBuilder::default();
-        let hull = calculate_epsilon_hull(&nfa);
-        let root_group = hull[&nfa.root].clone();
-        builder.pending_nodes.extend(hull.into_values());
+        let root_group = expand_group(&nfa, &[nfa.root]);
+        builder.pending_nodes.insert(root_group.clone());
 
         while let Some(group) = builder.pending_nodes.iter().next() {
             let group = group.clone();
@@ -176,16 +175,6 @@ fn get_non_epsilon_edges(nfa: &Nfa, group: &[NfaIndex]) -> Vec<(RegexPattern, Nf
     edges
 }
 
-fn calculate_epsilon_hull(nfa: &Nfa) -> Map<NfaIndex, Vec<NfaIndex>> {
-    let mut hull = Map::default();
-
-    for idx in nfa.iter() {
-        hull.insert(idx, get_connected_nodes(nfa, idx));
-    }
-
-    hull
-}
-
 fn expand_group(nfa: &Nfa, group: &[NfaIndex]) -> Vec<NfaIndex> {
     let mut nodes = Set::default();
     for idx in group.iter().copied() {
@@ -321,6 +310,11 @@ mod tests {
         insta::assert_debug_snapshot!(parse("A{foo}B+{bar}"));
         insta::assert_debug_snapshot!(parse("[a-e]"));
         insta::assert_debug_snapshot!(parse(".{var}."));
+    }
+
+    #[test]
+    fn test_simplify() {
+        insta::assert_debug_snapshot!(parse(".+;"));
     }
 
     #[test]

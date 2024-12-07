@@ -114,5 +114,6 @@ mod tests {
         insta::assert_snapshot!(dbg_re_parse!("A+", "A"));
         insta::assert_snapshot!(dbg_re_parse!("({var*},)*", "1,2,3,4,"));
         insta::assert_snapshot!(dbg_re_parse!("([abc]\\s*)*", "A"));
+        insta::assert_snapshot!(dbg_re_parse!("A.*B.*;", "AAABBB;"));
     }
 }

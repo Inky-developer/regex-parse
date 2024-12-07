@@ -66,45 +66,6 @@ Ok(
                         },
                     },
                 },
-                DfaNode {
-                    is_accepting: false,
-                    variable: None,
-                    edges: DfaEdges {
-                        default: None,
-                        edges: {
-                            'b': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-                                0,
-                            ),
-                            'c': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-                                2,
-                            ),
-                        },
-                    },
-                },
-                DfaNode {
-                    is_accepting: false,
-                    variable: None,
-                    edges: DfaEdges {
-                        default: None,
-                        edges: {
-                            'c': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-                                2,
-                            ),
-                        },
-                    },
-                },
-                DfaNode {
-                    is_accepting: false,
-                    variable: None,
-                    edges: DfaEdges {
-                        default: None,
-                        edges: {
-                            'b': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-                                0,
-                            ),
-                        },
-                    },
-                },
             ],
         },
     },

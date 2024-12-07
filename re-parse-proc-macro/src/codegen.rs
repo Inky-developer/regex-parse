@@ -251,9 +251,7 @@ impl Codegen {
             .map(|(transition, patterns)| {
                 let transition = transition.quote();
                 if patterns.iter().any(|it| it.is_none()) {
-                    quote! {_ => {
-                        #transition
-                    }}
+                    quote! {_ => #transition,}
                 } else {
                     let mut chars = patterns.iter().map(|it| it.unwrap()).collect::<Vec<_>>();
                     chars.sort_unstable();

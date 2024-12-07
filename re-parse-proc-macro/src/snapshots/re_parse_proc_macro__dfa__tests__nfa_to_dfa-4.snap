@@ -42,30 +42,6 @@ Ok(
                         edges: {},
                     },
                 },
-                DfaNode {
-                    is_accepting: false,
-                    variable: None,
-                    edges: DfaEdges {
-                        default: None,
-                        edges: {
-                            'A': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-                                2,
-                            ),
-                        },
-                    },
-                },
-                DfaNode {
-                    is_accepting: false,
-                    variable: None,
-                    edges: DfaEdges {
-                        default: None,
-                        edges: {
-                            'A': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-                                2,
-                            ),
-                        },
-                    },
-                },
             ],
         },
     },

@@ -6,15 +6,31 @@ snapshot_kind: text
 Ok(
     Dfa {
         root: ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-            3,
+            1,
         ),
         nodes: Arena {
             nodes: [
                 DfaNode {
-                    is_accepting: true,
+                    is_accepting: false,
                     variable: None,
                     edges: DfaEdges {
-                        default: None,
+                        default: Some(
+                            ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
+                                2,
+                            ),
+                        ),
+                        edges: {},
+                    },
+                },
+                DfaNode {
+                    is_accepting: false,
+                    variable: None,
+                    edges: DfaEdges {
+                        default: Some(
+                            ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
+                                0,
+                            ),
+                        ),
                         edges: {},
                     },
                 },
@@ -29,33 +45,17 @@ Ok(
                     edges: DfaEdges {
                         default: Some(
                             ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-                                0,
+                                3,
                             ),
                         ),
                         edges: {},
                     },
                 },
                 DfaNode {
-                    is_accepting: false,
+                    is_accepting: true,
                     variable: None,
                     edges: DfaEdges {
-                        default: Some(
-                            ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-                                1,
-                            ),
-                        ),
-                        edges: {},
-                    },
-                },
-                DfaNode {
-                    is_accepting: false,
-                    variable: None,
-                    edges: DfaEdges {
-                        default: Some(
-                            ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-                                2,
-                            ),
-                        ),
+                        default: None,
                         edges: {},
                     },
                 },

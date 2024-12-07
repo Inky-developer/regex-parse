@@ -6,18 +6,10 @@ snapshot_kind: text
 Ok(
     Dfa {
         root: ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-            2,
+            1,
         ),
         nodes: Arena {
             nodes: [
-                DfaNode {
-                    is_accepting: true,
-                    variable: None,
-                    edges: DfaEdges {
-                        default: None,
-                        edges: {},
-                    },
-                },
                 DfaNode {
                     is_accepting: false,
                     variable: None,
@@ -25,7 +17,7 @@ Ok(
                         default: None,
                         edges: {
                             'B': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-                                0,
+                                2,
                             ),
                         },
                     },
@@ -37,9 +29,17 @@ Ok(
                         default: None,
                         edges: {
                             'A': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-                                1,
+                                0,
                             ),
                         },
+                    },
+                },
+                DfaNode {
+                    is_accepting: true,
+                    variable: None,
+                    edges: DfaEdges {
+                        default: None,
+                        edges: {},
                     },
                 },
             ],
