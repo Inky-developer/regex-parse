@@ -19,9 +19,15 @@ fn test_empty() {
 }
 
 #[test]
-#[should_panic(expected = "Invalid character: 1")]
+#[should_panic(expected = "Unexpected character 1. Expected 'End of input'")]
 fn test_empty_fail() {
     re_parse!("", "1");
+}
+
+#[test]
+#[should_panic(expected = "Unexpected character: D. Expected one of: 'A, B, C'")]
+fn test_unexpected_character() {
+    re_parse!("[ABC]*", "ABCD");
 }
 
 #[test]

@@ -180,65 +180,93 @@ impl Codegen {
 
         let default_edge = match state.edges.default {
             Some(target) => (
-                quote! {_},
-                self.make_state_transition(dfa_idx, target, states, variables),
+                None,
+                StateTransition::Valid {
+                    target: states[&target].clone(),
+                    variable_update: self.make_variable_update(dfa_idx, target, variables),
+                },
             ),
-            None => (quote! {char}, quote! {panic!("Invalid character: {char}")}),
+            None => {
+                let expected = if state.edges.edges.is_empty() {
+                    vec!["End of input".to_string()]
+                } else {
+                    state.edges.edges.keys().copied().map(Into::into).collect()
+                };
+                (None, StateTransition::Invalid { expected })
+            }
         };
-        let (patterns, branches): (Vec<TokenStream>, Vec<TokenStream>) = state
+        let initial_patterns = state
             .edges
             .edges
             .iter()
-            .map(|(char, idx)| (quote! {#char}, *idx))
-            .map(|(pattern, target)| {
+            .map(|(char, idx)| {
                 (
-                    pattern,
-                    self.make_state_transition(dfa_idx, target, states, variables),
+                    Some(*char),
+                    StateTransition::Valid {
+                        target: states[idx].clone(),
+                        variable_update: self.make_variable_update(dfa_idx, *idx, variables),
+                    },
                 )
             })
-            .chain(std::iter::once(default_edge))
-            .unzip();
+            .chain(std::iter::once(default_edge));
+
+        let simplified_patterns = self.simplify_match(initial_patterns);
 
         quote! {
             __State::#internal_name => {
                 match __next_char {
-                    #(#patterns => #branches),*
+                    #(#simplified_patterns)*
                 }
             }
         }
     }
 
-    fn make_state_transition(
+    fn simplify_match(
+        &self,
+        patterns_and_transitions: impl Iterator<Item = (Option<char>, StateTransition)>,
+    ) -> Vec<TokenStream> {
+        let mut simplified: Map<StateTransition, Vec<Option<char>>> = Map::default();
+
+        for (pattern, transition) in patterns_and_transitions {
+            simplified
+                .entry(transition.clone())
+                .or_default()
+                .push(pattern);
+        }
+
+        // Sort the patterns and transitions, so that the default pattern is always at the end
+        let mut simplified: Vec<_> = simplified.into_iter().collect();
+        simplified.sort_unstable_by_key(|(_, patterns)| patterns.iter().any(|it| it.is_none()));
+
+        simplified
+            .into_iter()
+            .map(|(transition, patterns)| {
+                let transition = transition.quote();
+                if patterns.iter().any(|it| it.is_none()) {
+                    quote! {_ => {
+                        #transition
+                    }}
+                } else {
+                    let chars = patterns.iter().map(|it| it.unwrap());
+                    quote! {#(#chars)|* => #transition,}
+                }
+            })
+            .collect()
+    }
+
+    fn make_variable_update(
         &self,
         current_idx: DfaIndex,
         target_idx: DfaIndex,
-        states: &Map<DfaIndex, Ident>,
         variables: &Map<String, Variable>,
-    ) -> TokenStream {
+    ) -> VariableUpdate {
         let current_state = &self.dfa.nodes[current_idx];
         let target_state = &self.dfa.nodes[target_idx];
 
-        let variable_update = match (&current_state.variable, &target_state.variable) {
-            (None, Some(_)) => Some(quote! {
-                __variable_start = __byte_index;
-            }),
-            (Some(var), None) => {
-                let internal_var = &variables[&var.name];
-                let variable_update =
-                    self.quote_update_variable(internal_var, quote! {__byte_index});
-                Some(variable_update)
-            }
-            _ => None,
-        }
-        .into_iter();
-
-        let next_state = &states[&target_idx];
-
-        quote! {
-            {
-                #(#variable_update)*
-                __state = __State::#next_state;
-            }
+        match (&current_state.variable, &target_state.variable) {
+            (None, Some(_)) => VariableUpdate::StartVariable,
+            (Some(var), None) => VariableUpdate::EndVariable(variables[&var.name].clone()),
+            _ => VariableUpdate::NoVariable,
         }
     }
 
@@ -272,8 +300,72 @@ impl Codegen {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Hash)]
+#[derive(Debug, Eq, PartialEq, Hash, Clone)]
 struct Variable {
     kind: VariableKind,
     ident: Ident,
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+enum StateTransition {
+    Invalid {
+        expected: Vec<String>,
+    },
+    Valid {
+        target: Ident,
+        variable_update: VariableUpdate,
+    },
+}
+
+impl StateTransition {
+    fn quote(&self) -> TokenStream {
+        match self {
+            StateTransition::Invalid { expected } => {
+                let message = match expected.as_slice() {
+                    [single] => {
+                        format!("Unexpected character {{__next_char}}. Expected '{single}'")
+                    }
+                    _ => format!(
+                        "Unexpected character: {{__next_char}}. Expected one of: '{}'",
+                        expected.join(", ")
+                    ),
+                };
+                quote! {panic!(#message)}
+            }
+            StateTransition::Valid {
+                target,
+                variable_update,
+            } => {
+                let variable_update = variable_update.quote();
+                quote! {{
+                    #variable_update
+                    __state = __State::#target;
+                }}
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+enum VariableUpdate {
+    NoVariable,
+    StartVariable,
+    EndVariable(Variable),
+}
+
+impl VariableUpdate {
+    fn quote(&self) -> TokenStream {
+        match self {
+            VariableUpdate::NoVariable => quote! {},
+            VariableUpdate::StartVariable => quote! {__variable_start = __byte_index;},
+            VariableUpdate::EndVariable(Variable {
+                kind: VariableKind::Singular,
+                ident,
+            }) => quote! {#ident = __variable_start..__byte_index;},
+            VariableUpdate::EndVariable(Variable {
+                kind: VariableKind::Multiple,
+                ident,
+            }) => quote! {#ident.push(__variable_start..__byte_index);},
+        }
+    }
 }

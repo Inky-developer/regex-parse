@@ -23,42 +23,26 @@ fn main() {
             match __state {
                 __State::State_0 => {
                     match __next_char {
-                        'a' => {
+                        'a' | 'b' | 'c' => {
                             __state = __State::State_1;
                         }
-                        'b' => {
-                            __state = __State::State_1;
+                        _ => {
+                            panic!(
+                                "Unexpected character: {__next_char}. Expected one of: 'a, b, c'"
+                            )
                         }
-                        'c' => {
-                            __state = __State::State_1;
-                        }
-                        char => panic!("Invalid character: {char}"),
                     }
                 }
                 __State::State_1 => {
                     match __next_char {
-                        ' ' => {
+                        ' ' | '\r' | 'b' | '\n' | 'a' | '\t' | 'c' => {
                             __state = __State::State_1;
                         }
-                        '\r' => {
-                            __state = __State::State_1;
+                        _ => {
+                            panic!(
+                                "Unexpected character: {__next_char}. Expected one of: ' , \r, b, \n, a, \t, c'"
+                            )
                         }
-                        'b' => {
-                            __state = __State::State_1;
-                        }
-                        '\n' => {
-                            __state = __State::State_1;
-                        }
-                        'a' => {
-                            __state = __State::State_1;
-                        }
-                        '\t' => {
-                            __state = __State::State_1;
-                        }
-                        'c' => {
-                            __state = __State::State_1;
-                        }
-                        char => panic!("Invalid character: {char}"),
                     }
                 }
             }

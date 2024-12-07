@@ -26,7 +26,7 @@ fn main() {
                         'A' => {
                             __state = __State::State_1;
                         }
-                        char => panic!("Invalid character: {char}"),
+                        _ => panic!("Unexpected character {__next_char}. Expected 'A'"),
                     }
                 }
                 __State::State_1 => {
@@ -34,7 +34,7 @@ fn main() {
                         'A' => {
                             __state = __State::State_1;
                         }
-                        char => panic!("Invalid character: {char}"),
+                        _ => panic!("Unexpected character {__next_char}. Expected 'A'"),
                     }
                 }
             }
