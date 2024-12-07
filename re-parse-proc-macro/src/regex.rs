@@ -68,7 +68,7 @@ pub enum RegexPattern {
     AnyCharLazy,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct RegexVariable {
     pub name: String,
     pub kind: VariableKind,

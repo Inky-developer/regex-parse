@@ -79,10 +79,40 @@ impl Parse for ReParseInput {
 pub fn re_parse(input: TokenStream) -> TokenStream {
     let ReParseInput { regex, expression } = parse_macro_input!(input as ReParseInput);
 
+    let result = re_parse_impl(regex, expression);
+    result.into()
+}
+
+fn re_parse_impl(regex: LitStr, expression: Expr) -> proc_macro2::TokenStream {
     let regex = Regex::from_str(&regex.value()).unwrap();
     let nfa = Nfa::from(regex);
     let dfa = Dfa::from(nfa);
     let codegen = Codegen { dfa, expression };
-    let result = codegen.generate();
-    result.into()
+    codegen.generate()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{re_parse_impl, ReParseInput};
+    use quote::quote;
+
+    fn test_re_parse(input: proc_macro2::TokenStream) -> String {
+        let ReParseInput { regex, expression } = syn::parse2::<ReParseInput>(input).unwrap();
+        let stream = re_parse_impl(regex, expression);
+        let file_content = format!("fn main() {{ {stream} }}");
+        let file = syn::parse_file(&file_content).unwrap();
+        prettyplease::unparse(&file)
+    }
+
+    macro_rules! dbg_re_parse {
+        ($($input:tt)*) => {test_re_parse(quote! {$($input)*})};
+    }
+
+    #[test]
+    fn test_macro_expansion() {
+        insta::assert_snapshot!(dbg_re_parse!("A", "A"));
+        insta::assert_snapshot!(dbg_re_parse!("A+", "A"));
+        insta::assert_snapshot!(dbg_re_parse!("({var*},)*", "1,2,3,4,"));
+        insta::assert_snapshot!(dbg_re_parse!("([abc]\\s*)*", "A"));
+    }
 }

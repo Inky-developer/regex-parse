@@ -1,0 +1,51 @@
+---
+source: re-parse-proc-macro/src/lib.rs
+expression: "dbg_re_parse!(\"({var*},)*\", \"1,2,3,4,\")"
+snapshot_kind: text
+---
+fn main() {
+    {
+        let mut __var_0 = ::std::vec::Vec::new();
+        enum __State {
+            State_1,
+            State_0,
+        }
+        let __initial_input = "1,2,3,4,";
+        let mut __input = __initial_input.char_indices();
+        let mut __variable_start = 0_usize;
+        let mut __state = __State::State_0;
+        loop {
+            let Some((__byte_index, __next_char)) = __input.next() else {
+                match __state {
+                    __State::State_1 => panic!("Unexpected end of input (State_1)"),
+                    __State::State_0 => break,
+                }
+            };
+            match __state {
+                __State::State_0 => {
+                    match __next_char {
+                        _ => {
+                            __variable_start = __byte_index;
+                            __state = __State::State_1;
+                        }
+                    }
+                }
+                __State::State_1 => {
+                    match __next_char {
+                        ',' => {
+                            __var_0.push(__variable_start..__byte_index);
+                            __state = __State::State_0;
+                        }
+                        _ => {
+                            __state = __State::State_1;
+                        }
+                    }
+                }
+            }
+        }
+        var = __var_0
+            .into_iter()
+            .map(|span| __initial_input[span].parse().unwrap())
+            .collect();
+    }
+}

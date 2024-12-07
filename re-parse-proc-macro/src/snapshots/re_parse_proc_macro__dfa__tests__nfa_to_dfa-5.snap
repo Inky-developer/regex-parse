@@ -17,7 +17,7 @@ Ok(
                         default: None,
                         edges: {
                             'b': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-                                1,
+                                0,
                             ),
                             'c': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
                                 2,
@@ -32,7 +32,7 @@ Ok(
                         default: None,
                         edges: {
                             'b': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-                                1,
+                                0,
                             ),
                             'c': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
                                 2,
@@ -58,7 +58,7 @@ Ok(
                                 0,
                             ),
                             'b': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-                                1,
+                                0,
                             ),
                             'c': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
                                 2,
@@ -73,7 +73,7 @@ Ok(
                         default: None,
                         edges: {
                             'b': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-                                1,
+                                0,
                             ),
                             'c': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
                                 2,
@@ -100,7 +100,7 @@ Ok(
                         default: None,
                         edges: {
                             'b': ArenaIndex<re_parse_proc_macro::dfa::DfaNode>(
-                                1,
+                                0,
                             ),
                         },
                     },

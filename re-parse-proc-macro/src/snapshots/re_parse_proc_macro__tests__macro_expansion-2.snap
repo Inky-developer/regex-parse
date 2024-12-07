@@ -1,0 +1,43 @@
+---
+source: re-parse-proc-macro/src/lib.rs
+expression: "dbg_re_parse!(\"A+\", \"A\")"
+snapshot_kind: text
+---
+fn main() {
+    {
+        enum __State {
+            State_1,
+            State_0,
+        }
+        let __initial_input = "A";
+        let mut __input = __initial_input.char_indices();
+        let mut __variable_start = 0_usize;
+        let mut __state = __State::State_0;
+        loop {
+            let Some((__byte_index, __next_char)) = __input.next() else {
+                match __state {
+                    __State::State_1 => break,
+                    __State::State_0 => panic!("Unexpected end of input (State_0)"),
+                }
+            };
+            match __state {
+                __State::State_0 => {
+                    match __next_char {
+                        'A' => {
+                            __state = __State::State_1;
+                        }
+                        char => panic!("Invalid character: {char}"),
+                    }
+                }
+                __State::State_1 => {
+                    match __next_char {
+                        'A' => {
+                            __state = __State::State_1;
+                        }
+                        char => panic!("Invalid character: {char}"),
+                    }
+                }
+            }
+        }
+    }
+}

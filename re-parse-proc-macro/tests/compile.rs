@@ -33,6 +33,7 @@ fn test_parse_text() {
     assert_eq!(var, 1);
     assert_eq!(var2, 2);
 }
+
 #[test]
 fn test_parse_regex() {
     let foo: u32;
@@ -63,12 +64,11 @@ fn test_parse_var_in_loop() {
     assert_eq!(var, 1234);
 }
 
-// FIXME: This should parse into a `Vec<u32>`
 #[test]
 fn test_parse_var_in_loop2() {
-    let var: u32;
-    re_parse!("({var},)*", "1,2,3,4,");
-    assert_eq!(var, 4);
+    let var: Vec<u32>;
+    re_parse!("({var*},)*", "1,2,3,4,");
+    assert_eq!(var, vec![1, 2, 3, 4]);
 }
 
 #[test]

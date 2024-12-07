@@ -3,6 +3,7 @@ use crate::nfa::{Nfa, NfaEdge, NfaIndex, NfaNodeKind};
 use crate::regex::{RegexPattern, RegexVariable};
 use crate::util::FloodFill;
 use crate::{Map, Set};
+use std::collections::HashSet;
 
 pub type DfaArena = Arena<DfaNode>;
 pub type DfaIndex = ArenaIndex<DfaNode>;
@@ -33,6 +34,8 @@ impl From<Nfa> for Dfa {
             builder.compute_group(&nfa, group);
         }
 
+        builder.dedup();
+
         let root = builder.nfa_to_dfa[&root_group];
         Dfa {
             root,
@@ -62,6 +65,41 @@ pub struct DfaBuilder {
 }
 
 impl DfaBuilder {
+    fn dedup(&mut self) {
+        let mut fixed_duplicates = HashSet::new();
+        loop {
+            let mut visited_nodes: Vec<DfaIndex> = Vec::new();
+            let mut duplicates: Vec<(DfaIndex, DfaIndex)> = Vec::new();
+
+            let valid_nodes = self
+                .nodes
+                .iter()
+                .filter(|idx| !fixed_duplicates.contains(idx));
+            for node_idx in valid_nodes {
+                let node = &self.nodes[node_idx];
+                let other_node_index = visited_nodes
+                    .iter()
+                    .find(|other| &self.nodes[**other] == node);
+                if let Some(idx) = other_node_index {
+                    duplicates.push((node_idx, *idx));
+                } else {
+                    visited_nodes.push(node_idx);
+                }
+            }
+
+            if duplicates.is_empty() {
+                break;
+            }
+
+            for (previous, new) in duplicates {
+                fixed_duplicates.insert(previous);
+                for (_, node) in self.nodes.iter_mut() {
+                    node.edges.replace(previous, new);
+                }
+            }
+        }
+    }
+
     fn insert(&mut self, key: Vec<NfaIndex>, node: DfaNode) -> DfaIndex {
         if let Some(idx) = self.nfa_to_dfa.get(&key) {
             self.nodes[*idx] = node;
@@ -182,20 +220,33 @@ fn get_connected_nodes(nfa: &Nfa, idx: NfaIndex) -> Vec<NfaIndex> {
     result
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Eq, PartialEq)]
 pub struct DfaNode {
     pub is_accepting: bool,
     pub variable: Option<RegexVariable>,
     pub edges: DfaEdges,
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Eq, PartialEq)]
 pub struct DfaEdges {
     pub default: Option<DfaIndex>,
     pub edges: Map<char, DfaIndex>,
 }
 
 impl DfaEdges {
+    fn replace(&mut self, old_target: DfaIndex, new_target: DfaIndex) {
+        let DfaEdges { default, edges } = self;
+        if *default == Some(old_target) {
+            *default = Some(new_target);
+        }
+
+        for edge in edges.values_mut() {
+            if *edge == old_target {
+                *edge = new_target;
+            }
+        }
+    }
+
     fn from_nfa_group(dfa: &mut DfaBuilder, nfa: &Nfa, group: &[NfaIndex]) -> Self {
         let edges = get_non_epsilon_edges(nfa, group);
 
@@ -270,6 +321,13 @@ mod tests {
         insta::assert_debug_snapshot!(parse("A{foo}B+{bar}"));
         insta::assert_debug_snapshot!(parse("[a-e]"));
         insta::assert_debug_snapshot!(parse(".{var}."));
+    }
+
+    #[test]
+    fn test_simplify_dfa() {
+        // Without simplification, this is a relatively big state machine
+        // With simplification, only two states are used.
+        insta::assert_debug_snapshot!(parse("([abc]\\s*)*"));
     }
 
     #[test]

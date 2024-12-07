@@ -1,0 +1,67 @@
+---
+source: re-parse-proc-macro/src/lib.rs
+expression: "dbg_re_parse!(\"([abc]\\\\s*)*\", \"A\")"
+snapshot_kind: text
+---
+fn main() {
+    {
+        enum __State {
+            State_0,
+            State_1,
+        }
+        let __initial_input = "A";
+        let mut __input = __initial_input.char_indices();
+        let mut __variable_start = 0_usize;
+        let mut __state = __State::State_0;
+        loop {
+            let Some((__byte_index, __next_char)) = __input.next() else {
+                match __state {
+                    __State::State_0 => break,
+                    __State::State_1 => break,
+                }
+            };
+            match __state {
+                __State::State_0 => {
+                    match __next_char {
+                        'a' => {
+                            __state = __State::State_1;
+                        }
+                        'b' => {
+                            __state = __State::State_1;
+                        }
+                        'c' => {
+                            __state = __State::State_1;
+                        }
+                        char => panic!("Invalid character: {char}"),
+                    }
+                }
+                __State::State_1 => {
+                    match __next_char {
+                        ' ' => {
+                            __state = __State::State_1;
+                        }
+                        '\r' => {
+                            __state = __State::State_1;
+                        }
+                        'b' => {
+                            __state = __State::State_1;
+                        }
+                        '\n' => {
+                            __state = __State::State_1;
+                        }
+                        'a' => {
+                            __state = __State::State_1;
+                        }
+                        '\t' => {
+                            __state = __State::State_1;
+                        }
+                        'c' => {
+                            __state = __State::State_1;
+                        }
+                        char => panic!("Invalid character: {char}"),
+                    }
+                }
+            }
+        }
+    }
+}

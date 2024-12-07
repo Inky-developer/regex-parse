@@ -21,6 +21,13 @@ impl<T> Arena<T> {
             .enumerate()
             .map(|(i, _)| ArenaIndex::new(i))
     }
+
+    pub fn iter_mut(&mut self) -> impl Iterator<Item = (ArenaIndex<T>, &mut T)> + use<'_, T> {
+        self.nodes
+            .iter_mut()
+            .enumerate()
+            .map(move |(i, b)| (ArenaIndex::new(i), b))
+    }
 }
 
 impl<T> Index<ArenaIndex<T>> for Arena<T> {
