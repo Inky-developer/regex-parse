@@ -28,19 +28,19 @@ fn main() {
                         }
                         _ => {
                             panic!(
-                                "Unexpected character: {__next_char}. Expected one of: 'a, b, c'"
+                                "Unexpected character: {__next_char}. Expected one of: 'a', 'b', 'c'"
                             )
                         }
                     }
                 }
                 __State::State_1 => {
                     match __next_char {
-                        ' ' | '\r' | 'b' | '\n' | 'a' | '\t' | 'c' => {
+                        '\t' | '\n' | '\r' | ' ' | 'a' | 'b' | 'c' => {
                             __state = __State::State_1;
                         }
                         _ => {
                             panic!(
-                                "Unexpected character: {__next_char}. Expected one of: ' , \r, b, \n, a, \t, c'"
+                                "Unexpected character: {__next_char}. Expected one of: '\t', '\n', '\r', ' ', 'a', 'b', 'c'"
                             )
                         }
                     }

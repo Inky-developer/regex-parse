@@ -25,7 +25,7 @@ fn test_empty_fail() {
 }
 
 #[test]
-#[should_panic(expected = "Unexpected character: D. Expected one of: 'A, B, C'")]
+#[should_panic(expected = "Unexpected character: D. Expected one of: 'A', 'B', 'C'")]
 fn test_unexpected_character() {
     re_parse!("[ABC]*", "ABCD");
 }

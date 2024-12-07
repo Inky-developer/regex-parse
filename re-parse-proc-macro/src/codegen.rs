@@ -190,7 +190,15 @@ impl Codegen {
                 let expected = if state.edges.edges.is_empty() {
                     vec!["End of input".to_string()]
                 } else {
-                    state.edges.edges.keys().copied().map(Into::into).collect()
+                    let mut expected_chars = state
+                        .edges
+                        .edges
+                        .keys()
+                        .copied()
+                        .map(Into::into)
+                        .collect::<Vec<_>>();
+                    expected_chars.sort_unstable();
+                    expected_chars
                 };
                 (None, StateTransition::Invalid { expected })
             }
@@ -247,7 +255,8 @@ impl Codegen {
                         #transition
                     }}
                 } else {
-                    let chars = patterns.iter().map(|it| it.unwrap());
+                    let mut chars = patterns.iter().map(|it| it.unwrap()).collect::<Vec<_>>();
+                    chars.sort_unstable();
                     quote! {#(#chars)|* => #transition,}
                 }
             })
@@ -326,8 +335,12 @@ impl StateTransition {
                         format!("Unexpected character {{__next_char}}. Expected '{single}'")
                     }
                     _ => format!(
-                        "Unexpected character: {{__next_char}}. Expected one of: '{}'",
-                        expected.join(", ")
+                        "Unexpected character: {{__next_char}}. Expected one of: {}",
+                        expected
+                            .iter()
+                            .map(|it| format!("'{it}'"))
+                            .collect::<Vec<_>>()
+                            .join(", ")
                     ),
                 };
                 quote! {panic!(#message)}
