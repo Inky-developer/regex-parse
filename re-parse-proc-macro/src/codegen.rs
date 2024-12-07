@@ -37,7 +37,7 @@ impl Codegen {
             .map(|var| self.quote_variable_setup(var));
         let variable_finalizers = variable_map
             .iter()
-            .map(|(k, v)| self.quote_variable_finalizer(v, &k));
+            .map(|(k, v)| self.quote_variable_finalizer(v, k));
 
         let states = self.collect_states();
         let internal_states = states.values();
@@ -157,10 +157,14 @@ impl Codegen {
         states: &Map<DfaIndex, Ident>,
         variables: &Map<String, Variable>,
     ) -> Vec<TokenStream> {
-        states
+        // Let's sort the states first to make it easier to read the macro expansion
+        let mut sorted_states = states.iter().collect::<Vec<_>>();
+        sorted_states.sort_unstable_by_key(|(_, name)| *name);
+
+        sorted_states
             .iter()
             .map(|(dfa_idx, internal_name)| {
-                self.collect_state_branch(*dfa_idx, internal_name, states, variables)
+                self.collect_state_branch(**dfa_idx, internal_name, states, variables)
             })
             .collect()
     }
