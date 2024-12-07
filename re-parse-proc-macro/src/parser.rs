@@ -1,4 +1,6 @@
-use crate::regex::{Regex, RegexArena, RegexNode, RegexNodeIndex, RegexPattern};
+use crate::regex::{
+    Regex, RegexArena, RegexNode, RegexNodeIndex, RegexPattern, RegexVariable, VariableKind,
+};
 use crate::tokenizer::{PostfixToken, Token};
 use std::iter::Peekable;
 use thiserror::Error;
@@ -301,7 +303,13 @@ where
     fn parse_variable(&mut self) -> Result<()> {
         self.expect(Token::LeftBrace)?;
         let ident = self.parse_ident()?;
-        self.push_node(RegexNode::Variable(ident));
+        let kind = if self.peek() == Token::Postfix(PostfixToken::Star) {
+            self.consume();
+            VariableKind::Multiple
+        } else {
+            VariableKind::Singular
+        };
+        self.push_node(RegexNode::Variable(RegexVariable { name: ident, kind }));
         self.expect(Token::RightBrace)?;
         Ok(())
     }
@@ -338,6 +346,8 @@ mod tests {
     fn test_variable() {
         insta::assert_debug_snapshot!(parse("{a}"));
         insta::assert_debug_snapshot!(parse("a{a}b{b}c"));
+        insta::assert_debug_snapshot!(parse("{a*}"));
+        insta::assert_debug_snapshot!(parse("({a*},)*"));
     }
 
     #[test]

@@ -21,7 +21,10 @@ Ok(
                 DfaNode {
                     is_accepting: false,
                     variable: Some(
-                        "var",
+                        RegexVariable {
+                            name: "var",
+                            kind: Singular,
+                        },
                     ),
                     edges: DfaEdges {
                         default: Some(

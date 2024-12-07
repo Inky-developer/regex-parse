@@ -47,7 +47,7 @@ pub enum RegexNode {
     And(Vec<RegexNodeIndex>),
     Or(Vec<RegexNodeIndex>),
     Literal(RegexPattern),
-    Variable(String),
+    Variable(RegexVariable),
     ZeroOrOne(RegexNodeIndex),
     Many(RegexNodeIndex),
     OneOrMore(RegexNodeIndex),
@@ -66,6 +66,18 @@ pub enum RegexPattern {
     /// This is used for variables: `{var}` gets transformed into `.+`, where the `.` is lazy.
     /// The reason this is done is to make it possible to match anything at all.
     AnyCharLazy,
+}
+
+#[derive(Debug, Clone)]
+pub struct RegexVariable {
+    pub name: String,
+    pub kind: VariableKind,
+}
+
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
+pub enum VariableKind {
+    Singular,
+    Multiple,
 }
 
 pub struct RegexDisplay<'arena> {
@@ -105,7 +117,10 @@ impl Display for RegexDisplay<'_> {
                 RegexPattern::Range(start, end) => write!(f, "{}-{}", start, end)?,
                 RegexPattern::AnyChar | RegexPattern::AnyCharLazy => f.write_char('.')?,
             },
-            RegexNode::Variable(var) => write!(f, "{{{var}}}")?,
+            RegexNode::Variable(RegexVariable { name, kind }) => match kind {
+                VariableKind::Singular => write!(f, "{{{name}}}")?,
+                VariableKind::Multiple => write!(f, "{{{name}*}}")?,
+            },
             RegexNode::ZeroOrOne(node) => {
                 Display::fmt(&self.node(*node), f)?;
                 f.write_char('?')?;

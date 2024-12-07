@@ -48,6 +48,13 @@ fn test_parse_regex_2() {
     re_parse!("((Hello|World) )*", "Hello World World Hello Hello World ");
 }
 
+#[test]
+fn test_parse_vec_var() {
+    let result: Vec<u32>;
+    re_parse!(r"\[({result*},?)*\]", "[1,2,3]");
+    assert_eq!(result, vec![1, 2, 3]);
+}
+
 // FIXME: This test should probably be an error, at least when parsing into `Vec`s is supported
 #[test]
 fn test_parse_var_in_loop() {

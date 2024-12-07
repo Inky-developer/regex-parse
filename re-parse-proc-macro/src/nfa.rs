@@ -1,5 +1,5 @@
 use crate::arena::{Arena, ArenaIndex};
-use crate::regex::{Regex, RegexArena, RegexNode, RegexNodeIndex, RegexPattern};
+use crate::regex::{Regex, RegexArena, RegexNode, RegexNodeIndex, RegexPattern, RegexVariable};
 use crate::util::FloodFill;
 use crate::Set;
 
@@ -38,11 +38,14 @@ impl From<Regex> for Nfa {
 fn check_variables(nodes: &NfaArena) {
     let mut visited_variables = Set::default();
     for node in nodes.iter() {
-        if let NfaNodeKind::Variable(var) = &nodes[node].kind {
-            if visited_variables.contains(var) {
-                panic!("(TODO MAKE ERROR) Variable \"{}\" is already declared", var);
+        if let NfaNodeKind::Variable(RegexVariable { name, .. }) = &nodes[node].kind {
+            if visited_variables.contains(name) {
+                panic!(
+                    "(TODO MAKE ERROR) Variable \"{}\" is already declared",
+                    name
+                );
             }
-            visited_variables.insert(var.clone());
+            visited_variables.insert(name.clone());
         }
     }
 }
@@ -67,7 +70,7 @@ impl NfaNode {
 #[derive(Debug)]
 pub enum NfaNodeKind {
     Simple,
-    Variable(String),
+    Variable(RegexVariable),
 }
 
 #[derive(Debug)]

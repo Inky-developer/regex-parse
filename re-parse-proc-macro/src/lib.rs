@@ -42,7 +42,20 @@ impl Parse for ReParseInput {
 /// Any variables contained in `pattern` will be set after the macro has run.
 /// For now, the macro will panic if the input cannot be parsed (TODO: Return error)
 ///
+/// The pattern is a regular expression which can contain variable captures.
+///
+/// ## Variable Captures
+/// - `{var_name}`: Captures a single variable of at least one character
+/// - `{var_name*}`: Captures multiple (or zero) variables
+///
+/// ## Character Classes
+/// `re_parse!` currently supports these character classes:
+/// - `\s`: Any Whitespace (equivalent to `[\n\t\r ]`)
+/// - `\d`: Any Digit (equivalent to `[0-9]`)
+/// - `\w`: Any Word (equivalent to `[a-zA-Z0-0_]`)
+///
 /// # Example
+///
 /// ```rust
 /// # use re_parse_proc_macro::re_parse;
 /// let name: String;
@@ -50,6 +63,14 @@ impl Parse for ReParseInput {
 /// re_parse!("The score of {name} is {score}", "The score of user is 55.8");
 /// assert_eq!(name, "user");
 /// assert_eq!(score, 55.8);
+/// ```
+///
+/// ## Multiple variables
+/// ```rust
+/// # use re_parse_proc_macro::re_parse;
+/// let temperatures: Vec<f32>;
+/// re_parse!(r"Temperatures: \[({temperatures*}\s*,?\s*)*\]", "Temperatures: [10.0, 9.0, 8.5, 8.0]");
+/// assert_eq!(temperatures, vec![10.0, 9.0, 8.5, 8.0]);
 /// ```
 ///
 /// # Efficiency

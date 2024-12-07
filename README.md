@@ -30,18 +30,18 @@ fn main() {
 ```
 
 ### Using regular expressions:
+
 ```rust
 use regex_parse::re_parse;
 
 fn main() {
-    let inputs = ["1 2", "3      4"];
+    let inputs = ["1 2 3 4", "-5      6 -7"];
     let parsed_inputs = inputs.map(|input| {
-        let first_number: u32;
-        let second_number: u32;
-        re_parse!("{first_number} +{second_number}", input);
-        (first_number, second_number)
+        let numbers: Vec<i32>;
+        re_parse!(r"({numbers*}\s*)*", input);
+        numbers
     });
-    assert_eq!(parsed_inputs, [(1, 2), (3, 4)]);
+    assert_eq!(parsed_inputs, [vec![1, 2, 3, 4], vec![-5, 6, -7]]);
 }
 ```
 
@@ -63,7 +63,3 @@ fn main() {
 - [ ] exactly n: `a{3}`
 - [ ] n or more: `a{3,}`
 - [ ] between n and m: `a{3,6}`
-
-## Missing Features
-- Parsing into `Vec`s: `({some_variable},)*`
-- Support for more regex features

@@ -45,7 +45,10 @@ Ok(
                         AnyCharLazy,
                     ),
                     kind: Variable(
-                        "var",
+                        RegexVariable {
+                            name: "var",
+                            kind: Singular,
+                        },
                     ),
                     is_accepting: false,
                 },

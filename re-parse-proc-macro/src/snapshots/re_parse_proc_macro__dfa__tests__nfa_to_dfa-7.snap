@@ -65,7 +65,10 @@ Ok(
                 DfaNode {
                     is_accepting: true,
                     variable: Some(
-                        "bar",
+                        RegexVariable {
+                            name: "bar",
+                            kind: Singular,
+                        },
                     ),
                     edges: DfaEdges {
                         default: Some(
@@ -79,7 +82,10 @@ Ok(
                 DfaNode {
                     is_accepting: false,
                     variable: Some(
-                        "foo",
+                        RegexVariable {
+                            name: "foo",
+                            kind: Singular,
+                        },
                     ),
                     edges: DfaEdges {
                         default: Some(

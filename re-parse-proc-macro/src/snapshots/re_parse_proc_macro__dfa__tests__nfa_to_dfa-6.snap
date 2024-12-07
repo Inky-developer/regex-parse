@@ -13,7 +13,10 @@ Ok(
                 DfaNode {
                     is_accepting: true,
                     variable: Some(
-                        "foo",
+                        RegexVariable {
+                            name: "foo",
+                            kind: Singular,
+                        },
                     ),
                     edges: DfaEdges {
                         default: Some(

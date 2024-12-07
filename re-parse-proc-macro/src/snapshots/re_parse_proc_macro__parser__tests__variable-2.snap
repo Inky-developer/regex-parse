@@ -11,7 +11,10 @@ Ok(
             ),
         ),
         Variable(
-            "a",
+            RegexVariable {
+                name: "a",
+                kind: Singular,
+            },
         ),
         Literal(
             Char(
@@ -19,7 +22,10 @@ Ok(
             ),
         ),
         Variable(
-            "b",
+            RegexVariable {
+                name: "b",
+                kind: Singular,
+            },
         ),
         Literal(
             Char(

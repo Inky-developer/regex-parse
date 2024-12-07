@@ -1,4 +1,5 @@
 use crate::dfa::{Dfa, DfaIndex};
+use crate::regex::VariableKind;
 use crate::{Map, Set};
 use proc_macro2::{Ident, Span, TokenStream};
 use quote::quote;
@@ -20,8 +21,23 @@ impl Codegen {
         let variable_map = variables
             .iter()
             .zip(variable_idents.iter())
-            .map(|(var, ident)| (var.to_string(), ident.clone()))
+            .map(|(var, ident)| {
+                (
+                    var.ident.to_string(),
+                    Variable {
+                        ident: ident.clone(),
+                        kind: var.kind,
+                    },
+                )
+            })
             .collect::<Map<_, _>>();
+
+        let variable_setups = variable_map
+            .values()
+            .map(|var| self.quote_variable_setup(var));
+        let variable_finalizers = variable_map
+            .iter()
+            .map(|(k, v)| self.quote_variable_finalizer(v, &k));
 
         let states = self.collect_states();
         let internal_states = states.values();
@@ -34,7 +50,7 @@ impl Codegen {
 
         quote! {
             {
-                #(let mut #variable_idents = 0_usize..0;)*
+                #(#variable_setups)*
 
                 enum __State {
                     #(#internal_states),*
@@ -56,15 +72,36 @@ impl Codegen {
                     }
                 }
 
-                #(#variables = __initial_input[#variable_idents].parse().unwrap();)*
+                #(#variable_finalizers)*
             }
+        }
+    }
+
+    fn quote_variable_finalizer(&self, var: &Variable, name: &str) -> TokenStream {
+        let ident = &var.ident;
+        let original_ident = Ident::new(name, Span::call_site());
+        match var.kind {
+            VariableKind::Singular => {
+                quote! { #original_ident = __initial_input[#ident].parse().unwrap();}
+            }
+            VariableKind::Multiple => {
+                quote! { #original_ident = #ident.into_iter().map(|span| __initial_input[span].parse().unwrap()).collect(); }
+            }
+        }
+    }
+
+    fn quote_variable_setup(&self, var: &Variable) -> TokenStream {
+        let ident = &var.ident;
+        match var.kind {
+            VariableKind::Singular => quote! { let mut #ident = 0_usize..0; },
+            VariableKind::Multiple => quote! { let mut #ident = ::std::vec::Vec::new(); },
         }
     }
 
     fn collect_state_terminations(
         &self,
         states: &Map<DfaIndex, Ident>,
-        variables: &Map<String, Ident>,
+        variables: &Map<String, Variable>,
     ) -> Vec<TokenStream> {
         states
             .iter()
@@ -78,7 +115,7 @@ impl Codegen {
         &self,
         dfa_idx: DfaIndex,
         internal_name: &Ident,
-        variables: &Map<String, Ident>,
+        variables: &Map<String, Variable>,
     ) -> TokenStream {
         let state = &self.dfa.nodes[dfa_idx];
 
@@ -86,10 +123,12 @@ impl Codegen {
 
         let termination = match (state.is_accepting, &state.variable) {
             (true, Some(var)) => {
-                let internal_var = &variables[var];
+                let internal_var = &variables[&var.name];
+                let update =
+                    self.quote_update_variable(internal_var, quote! {__initial_input.len()});
                 quote! {
                     {
-                        #internal_var = __variable_start..__initial_input.len();
+                        #update;
                         break;
                     }
                 }
@@ -103,10 +142,20 @@ impl Codegen {
         }
     }
 
+    fn quote_update_variable(&self, variable: &Variable, variable_end: TokenStream) -> TokenStream {
+        let ident = &variable.ident;
+        match variable.kind {
+            VariableKind::Singular => quote! { #ident = __variable_start..#variable_end; },
+            VariableKind::Multiple => {
+                quote! { #ident.push(__variable_start..#variable_end); }
+            }
+        }
+    }
+
     fn collect_state_branches(
         &self,
         states: &Map<DfaIndex, Ident>,
-        variables: &Map<String, Ident>,
+        variables: &Map<String, Variable>,
     ) -> Vec<TokenStream> {
         states
             .iter()
@@ -121,7 +170,7 @@ impl Codegen {
         dfa_idx: DfaIndex,
         internal_name: &Ident,
         states: &Map<DfaIndex, Ident>,
-        variables: &Map<String, Ident>,
+        variables: &Map<String, Variable>,
     ) -> TokenStream {
         let state = &self.dfa.nodes[dfa_idx];
 
@@ -160,7 +209,7 @@ impl Codegen {
         current_idx: DfaIndex,
         target_idx: DfaIndex,
         states: &Map<DfaIndex, Ident>,
-        variables: &Map<String, Ident>,
+        variables: &Map<String, Variable>,
     ) -> TokenStream {
         let current_state = &self.dfa.nodes[current_idx];
         let target_state = &self.dfa.nodes[target_idx];
@@ -170,10 +219,10 @@ impl Codegen {
                 __variable_start = __byte_index;
             }),
             (Some(var), None) => {
-                let internal_var = &variables[var];
-                Some(quote! {
-                    #internal_var = __variable_start..__byte_index;
-                })
+                let internal_var = &variables[&var.name];
+                let variable_update =
+                    self.quote_update_variable(internal_var, quote! {__byte_index});
+                Some(variable_update)
             }
             _ => None,
         }
@@ -189,12 +238,16 @@ impl Codegen {
         }
     }
 
-    fn collect_variables(&self) -> Vec<Ident> {
+    fn collect_variables(&self) -> Vec<Variable> {
         let mut variables = Set::default();
         for node_idx in self.dfa.iter() {
             let node = &self.dfa.nodes[node_idx];
             if let Some(variable) = &node.variable {
-                variables.insert(Ident::new(variable, Span::call_site()));
+                let ident = Ident::new(&variable.name, Span::call_site());
+                variables.insert(Variable {
+                    ident,
+                    kind: variable.kind,
+                });
             }
         }
 
@@ -213,4 +266,10 @@ impl Codegen {
             })
             .collect()
     }
+}
+
+#[derive(Debug, Eq, PartialEq, Hash)]
+struct Variable {
+    kind: VariableKind,
+    ident: Ident,
 }

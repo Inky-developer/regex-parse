@@ -1,6 +1,6 @@
 use crate::arena::{Arena, ArenaIndex};
 use crate::nfa::{Nfa, NfaEdge, NfaIndex, NfaNodeKind};
-use crate::regex::RegexPattern;
+use crate::regex::{RegexPattern, RegexVariable};
 use crate::util::FloodFill;
 use crate::{Map, Set};
 
@@ -101,7 +101,7 @@ impl DfaBuilder {
         );
     }
 
-    fn compute_group_variable(&self, nfa: &Nfa, group: &[NfaIndex]) -> Option<String> {
+    fn compute_group_variable(&self, nfa: &Nfa, group: &[NfaIndex]) -> Option<RegexVariable> {
         let mut variable = None;
 
         for nfa_idx in group.iter().copied() {
@@ -111,8 +111,11 @@ impl DfaBuilder {
 
             match variable {
                 None => variable = Some(var.clone()),
-                Some(other_var) => panic!(
-                    "(TODO THROW ERROR) ambiguous variables: {other_var} collides with {var}"
+                Some(RegexVariable {
+                    name: other_var, ..
+                }) => panic!(
+                    "(TODO THROW ERROR) ambiguous variables: {other_var} collides with {}",
+                    &var.name
                 ),
             }
         }
@@ -182,7 +185,7 @@ fn get_connected_nodes(nfa: &Nfa, idx: NfaIndex) -> Vec<NfaIndex> {
 #[derive(Debug, Default)]
 pub struct DfaNode {
     pub is_accepting: bool,
-    pub variable: Option<String>,
+    pub variable: Option<RegexVariable>,
     pub edges: DfaEdges,
 }
 
