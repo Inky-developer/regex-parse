@@ -271,9 +271,9 @@ impl Codegen {
         let target_state = &self.dfa.nodes[target_idx];
 
         match (&current_state.variable, &target_state.variable) {
-            (None, Some(_)) => VariableUpdate::StartVariable,
-            (Some(var), None) => VariableUpdate::EndVariable(variables[&var.name].clone()),
-            _ => VariableUpdate::NoVariable,
+            (None, Some(_)) => VariableUpdate::Start,
+            (Some(var), None) => VariableUpdate::End(variables[&var.name].clone()),
+            _ => VariableUpdate::None,
         }
     }
 
@@ -359,21 +359,21 @@ impl StateTransition {
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 enum VariableUpdate {
-    NoVariable,
-    StartVariable,
-    EndVariable(Variable),
+    None,
+    Start,
+    End(Variable),
 }
 
 impl VariableUpdate {
     fn quote(&self) -> TokenStream {
         match self {
-            VariableUpdate::NoVariable => quote! {},
-            VariableUpdate::StartVariable => quote! {__variable_start = __byte_index;},
-            VariableUpdate::EndVariable(Variable {
+            VariableUpdate::None => quote! {},
+            VariableUpdate::Start => quote! {__variable_start = __byte_index;},
+            VariableUpdate::End(Variable {
                 kind: VariableKind::Singular,
                 ident,
             }) => quote! {#ident = __variable_start..__byte_index;},
-            VariableUpdate::EndVariable(Variable {
+            VariableUpdate::End(Variable {
                 kind: VariableKind::Multiple,
                 ident,
             }) => quote! {#ident.push(__variable_start..__byte_index);},
