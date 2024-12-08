@@ -8,12 +8,14 @@ mod tokenizer;
 mod util;
 
 use crate::codegen::Codegen;
-use crate::dfa::Dfa;
-use crate::nfa::Nfa;
+use crate::dfa::{Dfa, DfaError};
+use crate::nfa::{Nfa, NfaError};
 use crate::regex::Regex;
 use proc_macro::TokenStream;
+use proc_macro2::Span;
 use syn::parse::{Parse, ParseStream};
 use syn::{parse_macro_input, Expr, LitStr};
+use thiserror::Error;
 
 // Use non-std map and set implementations to make snapshot testing possible.
 // std map and set implementations are not deterministic, which is required for that.
@@ -79,16 +81,58 @@ impl Parse for ReParseInput {
 pub fn re_parse(input: TokenStream) -> TokenStream {
     let ReParseInput { regex, expression } = parse_macro_input!(input as ReParseInput);
 
-    let result = re_parse_impl(regex, expression);
+    let result = re_parse_impl(regex, expression).unwrap_or_else(|err| err.into_token_stream());
     result.into()
 }
 
-fn re_parse_impl(regex: LitStr, expression: Expr) -> proc_macro2::TokenStream {
-    let regex = Regex::from_str(&regex.value()).unwrap();
-    let nfa = Nfa::from(regex);
-    let dfa = Dfa::from(nfa);
+fn re_parse_impl(
+    regex: LitStr,
+    expression: Expr,
+) -> Result<proc_macro2::TokenStream, ProcMacroError> {
+    // TODO: When subspan becomes stable, use that to get a more accurate span of the error
+    let span = regex.span();
+
+    let regex = Regex::from_str(&regex.value()).map_err(|err| ProcMacroError {
+        kind: err.into(),
+        span,
+    })?;
+    let nfa = Nfa::try_from(regex).map_err(|err| ProcMacroError {
+        kind: err.into(),
+        span,
+    })?;
+    let dfa = Dfa::try_from(nfa).map_err(|err| ProcMacroError {
+        kind: err.into(),
+        span,
+    })?;
     let codegen = Codegen { dfa, expression };
-    codegen.generate()
+    Ok(codegen.generate())
+}
+
+#[derive(Debug)]
+struct ProcMacroError {
+    kind: ProcMacroErrorKind,
+    span: Span,
+}
+
+#[derive(Debug, Error)]
+enum ProcMacroErrorKind {
+    #[error(transparent)]
+    Parse(#[from] parser::ParseError),
+    #[error(transparent)]
+    Nfa(#[from] NfaError),
+    #[error(transparent)]
+    Dfa(#[from] DfaError),
+}
+
+impl ProcMacroError {
+    fn into_token_stream(self) -> proc_macro2::TokenStream {
+        let msg = match self.kind {
+            ProcMacroErrorKind::Parse(parse_error) => parse_error.to_string(),
+            ProcMacroErrorKind::Nfa(nfa_error) => nfa_error.to_string(),
+            ProcMacroErrorKind::Dfa(dfa_error) => dfa_error.to_string(),
+        };
+        syn::Error::new(self.span, msg).into_compile_error()
+    }
 }
 
 #[cfg(test)]
@@ -98,7 +142,7 @@ mod tests {
 
     fn test_re_parse(input: proc_macro2::TokenStream) -> String {
         let ReParseInput { regex, expression } = syn::parse2::<ReParseInput>(input).unwrap();
-        let stream = re_parse_impl(regex, expression);
+        let stream = re_parse_impl(regex, expression).unwrap_or_else(|err| err.into_token_stream());
         let file_content = format!("fn main() {{ {stream} }}");
         let file = syn::parse_file(&file_content).unwrap();
         prettyplease::unparse(&file)
@@ -115,5 +159,10 @@ mod tests {
         insta::assert_snapshot!(dbg_re_parse!("({var*},)*", "1,2,3,4,"));
         insta::assert_snapshot!(dbg_re_parse!("([abc]\\s*)*", "A"));
         insta::assert_snapshot!(dbg_re_parse!("A.*B.*;", "AAABBB;"));
+    }
+
+    #[test]
+    fn test_macro_errors() {
+        insta::assert_snapshot!(dbg_re_parse!("A-", "A"));
     }
 }

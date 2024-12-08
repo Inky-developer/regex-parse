@@ -1,0 +1,5 @@
+error: Unexpected token '|'
+ --> tests/compile_fail/parse_errors/bar.rs:4:15
+  |
+4 |     re_parse!("a||B", "111B222");
+  |               ^^^^^^

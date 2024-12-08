@@ -2,9 +2,16 @@ use crate::arena::{Arena, ArenaIndex};
 use crate::regex::{Regex, RegexArena, RegexNode, RegexNodeIndex, RegexPattern, RegexVariable};
 use crate::util::FloodFill;
 use crate::Set;
+use thiserror::Error;
 
 pub type NfaArena = Arena<NfaNode>;
 pub type NfaIndex = ArenaIndex<NfaNode>;
+
+#[derive(Error, Debug)]
+pub enum NfaError {
+    #[error("The variable {} is already declared. Capturing a variable twice is not supported right now.", name)]
+    DuplicateVariable { name: String },
+}
 
 #[derive(Debug)]
 pub struct Nfa {
@@ -12,36 +19,37 @@ pub struct Nfa {
     pub nodes: NfaArena,
 }
 
-impl From<Regex> for Nfa {
-    fn from(value: Regex) -> Self {
+impl TryFrom<Regex> for Nfa {
+    type Error = NfaError;
+
+    fn try_from(value: Regex) -> Result<Self, NfaError> {
         let Regex { arena, root } = value;
         let mut nodes = NfaArena::default();
         let root_node = nodes.add(NfaNode::EPSILON);
         let target_node = convert_regex_node(&mut nodes, &arena, root, root_node);
         nodes[target_node].is_accepting = true;
 
-        check_variables(&nodes);
+        check_variables(&nodes)?;
 
-        Nfa {
+        Ok(Nfa {
             nodes,
             root: root_node,
-        }
+        })
     }
 }
 
-fn check_variables(nodes: &NfaArena) {
+fn check_variables(nodes: &NfaArena) -> Result<(), NfaError> {
     let mut visited_variables = Set::default();
     for node in nodes.iter() {
         if let NfaNodeKind::Variable(RegexVariable { name, .. }) = &nodes[node].kind {
             if visited_variables.contains(name) {
-                panic!(
-                    "(TODO MAKE ERROR) Variable \"{}\" is already declared",
-                    name
-                );
+                return Err(NfaError::DuplicateVariable { name: name.clone() });
             }
             visited_variables.insert(name.clone());
         }
     }
+
+    Ok(())
 }
 
 #[derive(Debug)]
@@ -177,12 +185,13 @@ impl FloodFill for Nfa {
 #[cfg(test)]
 mod tests {
     use crate::nfa::Nfa;
-    use crate::parser::ParseError;
     use crate::regex::Regex;
+    use crate::ProcMacroErrorKind;
 
-    fn parse(source: &str) -> Result<Nfa, ParseError> {
+    fn parse(source: &str) -> Result<Nfa, ProcMacroErrorKind> {
         let regex = Regex::from_str(source)?;
-        Ok(Nfa::from(regex))
+        let nfa = Nfa::try_from(regex)?;
+        Ok(nfa)
     }
 
     #[test]
@@ -192,5 +201,10 @@ mod tests {
         insta::assert_debug_snapshot!(parse("A?b*c"));
         insta::assert_debug_snapshot!(parse(".{var}."));
         insta::assert_debug_snapshot!(parse(".+;"));
+    }
+
+    #[test]
+    fn test_duplicate_variable() {
+        insta::assert_debug_snapshot!(parse("{foo}bar{foo}"));
     }
 }

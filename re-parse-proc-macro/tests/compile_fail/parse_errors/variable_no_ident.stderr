@@ -1,0 +1,5 @@
+error: Unexpected token '+'. Expected '}'
+ --> tests/compile_fail/parse_errors/variable_no_ident.rs:4:15
+  |
+4 |     re_parse!("{var+lksajdf}", "111B222");
+  |               ^^^^^^^^^^^^^^^

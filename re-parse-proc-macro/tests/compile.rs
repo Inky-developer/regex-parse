@@ -3,7 +3,7 @@ use re_parse_proc_macro::re_parse;
 #[test]
 fn test_compile_fails() {
     let t = trybuild::TestCases::new();
-    t.compile_fail("tests/compile_fail/*.rs");
+    t.compile_fail("tests/compile_fail/**/*.rs");
 }
 
 #[test]
@@ -63,7 +63,6 @@ fn test_parse_vec_var() {
     assert_eq!(result, vec![1, 2, 3]);
 }
 
-// FIXME: This test should probably be an error, at least when parsing into `Vec`s is supported
 #[test]
 fn test_parse_var_in_loop() {
     let var: u32;
@@ -76,6 +75,15 @@ fn test_parse_var_in_loop2() {
     let var: Vec<u32>;
     re_parse!("({var*},)*", "1,2,3,4,");
     assert_eq!(var, vec![1, 2, 3, 4]);
+}
+
+#[test]
+fn test_parse_var_in_loop3() {
+    let result: u32;
+    let operands: Vec<u32>;
+    re_parse!("{result}: ({operands*} ?)+", "3267: 81 40 27");
+    assert_eq!(result, 3267);
+    assert_eq!(operands, vec![81, 40, 27]);
 }
 
 #[test]

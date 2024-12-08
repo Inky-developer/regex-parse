@@ -351,6 +351,11 @@ mod tests {
     }
 
     #[test]
+    fn test_invalid_variable() {
+        insta::assert_debug_snapshot!(parse("{a+test}"));
+    }
+
+    #[test]
     fn test_postfix_operator() {
         insta::assert_debug_snapshot!(parse("a?"));
         insta::assert_debug_snapshot!(parse("a+"));

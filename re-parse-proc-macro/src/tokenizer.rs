@@ -125,7 +125,10 @@ where
 
         match char {
             '\\' => {
-                let next = self.chars.next().expect("Unterminated escape sequence");
+                let Some(next) = self.chars.next() else {
+                    // TODO: This should probably return an error
+                    return None;
+                };
                 let token = match next {
                     's' => Token::CharacterClass(CharacterClass::Whitespace),
                     'd' => Token::CharacterClass(CharacterClass::Digit),

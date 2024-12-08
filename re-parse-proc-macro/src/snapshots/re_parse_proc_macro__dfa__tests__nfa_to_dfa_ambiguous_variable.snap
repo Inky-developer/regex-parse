@@ -1,0 +1,13 @@
+---
+source: re-parse-proc-macro/src/dfa.rs
+expression: "parse(\"A{foo}B?{bar}\")"
+snapshot_kind: text
+---
+Err(
+    Dfa(
+        AmbiguousVariables {
+            first: "foo",
+            second: "bar",
+        },
+    ),
+)

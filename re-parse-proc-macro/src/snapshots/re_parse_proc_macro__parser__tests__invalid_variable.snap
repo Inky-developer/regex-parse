@@ -1,0 +1,13 @@
+---
+source: re-parse-proc-macro/src/parser.rs
+expression: "parse(\"{a+test}\")"
+snapshot_kind: text
+---
+Err(
+    UnexpectedToken {
+        got: Postfix(
+            Plus,
+        ),
+        expected: RightBrace,
+    },
+)

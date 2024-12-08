@@ -1,0 +1,5 @@
+error: Expected end of input, got '-'
+ --> tests/compile_fail/parse_errors/minus.rs:4:15
+  |
+4 |     re_parse!("a-b", "111B222");
+  |               ^^^^^

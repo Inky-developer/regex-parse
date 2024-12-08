@@ -1,0 +1,7 @@
+error: expected `,`
+ --> tests/compile_fail/missing_parameter.rs:4:5
+  |
+4 |     re_parse!("Hi")
+  |     ^^^^^^^^^^^^^^^
+  |
+  = note: this error originates in the macro `re_parse` (in Nightly builds, run with -Z macro-backtrace for more info)

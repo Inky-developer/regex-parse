@@ -1,0 +1,5 @@
+error: Expected an identifier, got '}'
+ --> tests/compile_fail/parse_errors/empty_ident.rs:4:15
+  |
+4 |     re_parse!("{}", "111B222");
+  |               ^^^^

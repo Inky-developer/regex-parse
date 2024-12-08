@@ -4,9 +4,16 @@ use crate::regex::{RegexPattern, RegexVariable};
 use crate::util::FloodFill;
 use crate::{Map, Set};
 use std::collections::HashSet;
+use thiserror::Error;
 
 pub type DfaArena = Arena<DfaNode>;
 pub type DfaIndex = ArenaIndex<DfaNode>;
+
+#[derive(Debug, Error)]
+pub enum DfaError {
+    #[error("Ambiguous variables: {} collides with {}. Make sure that variables are always separated by a character, so it is possible to tell them apart.", first, second)]
+    AmbiguousVariables { first: String, second: String },
+}
 
 #[derive(Debug)]
 pub struct Dfa {
@@ -20,8 +27,9 @@ impl Dfa {
     }
 }
 
-impl From<Nfa> for Dfa {
-    fn from(nfa: Nfa) -> Self {
+impl TryFrom<Nfa> for Dfa {
+    type Error = DfaError;
+    fn try_from(nfa: Nfa) -> Result<Self, DfaError> {
         let mut builder = DfaBuilder::default();
         let root_group = expand_group(&nfa, &[nfa.root]);
         builder.pending_nodes.insert(root_group.clone());
@@ -30,16 +38,16 @@ impl From<Nfa> for Dfa {
             let group = group.clone();
             builder.pending_nodes.remove(&group);
 
-            builder.compute_group(&nfa, group);
+            builder.compute_group(&nfa, group)?;
         }
 
         builder.dedup();
 
         let root = builder.nfa_to_dfa[&root_group];
-        Dfa {
+        Ok(Dfa {
             root,
             nodes: builder.nodes,
-        }
+        })
     }
 }
 
@@ -120,13 +128,13 @@ impl DfaBuilder {
         self.insert(key, node)
     }
 
-    fn compute_group(&mut self, nfa: &Nfa, group: Vec<NfaIndex>) {
+    fn compute_group(&mut self, nfa: &Nfa, group: Vec<NfaIndex>) -> Result<(), DfaError> {
         let edges = DfaEdges::from_nfa_group(self, nfa, &group);
         let is_accepting = group
             .iter()
             .copied()
             .any(|nfa_idx| nfa.nodes[nfa_idx].is_accepting);
-        let variable = self.compute_group_variable(nfa, &group);
+        let variable = self.compute_group_variable(nfa, &group)?;
 
         self.insert(
             group,
@@ -136,9 +144,14 @@ impl DfaBuilder {
                 edges,
             },
         );
+        Ok(())
     }
 
-    fn compute_group_variable(&self, nfa: &Nfa, group: &[NfaIndex]) -> Option<RegexVariable> {
+    fn compute_group_variable(
+        &self,
+        nfa: &Nfa,
+        group: &[NfaIndex],
+    ) -> Result<Option<RegexVariable>, DfaError> {
         let mut variable = None;
 
         for nfa_idx in group.iter().copied() {
@@ -150,14 +163,16 @@ impl DfaBuilder {
                 None => variable = Some(var.clone()),
                 Some(RegexVariable {
                     name: other_var, ..
-                }) => panic!(
-                    "(TODO THROW ERROR) ambiguous variables: {other_var} collides with {}",
-                    &var.name
-                ),
+                }) => {
+                    return Err(DfaError::AmbiguousVariables {
+                        first: other_var,
+                        second: var.name.clone(),
+                    })
+                }
             }
         }
 
-        variable
+        Ok(variable)
     }
 }
 
@@ -290,13 +305,14 @@ impl DfaEdges {
 mod tests {
     use crate::dfa::Dfa;
     use crate::nfa::Nfa;
-    use crate::parser::ParseError;
     use crate::regex::Regex;
+    use crate::ProcMacroErrorKind;
 
-    fn parse(input: &str) -> Result<Dfa, ParseError> {
+    fn parse(input: &str) -> Result<Dfa, ProcMacroErrorKind> {
         let regex = Regex::from_str(input)?;
-        let nfa = Nfa::from(regex);
-        Ok(Dfa::from(nfa))
+        let nfa = Nfa::try_from(regex)?;
+        let dfa = Dfa::try_from(nfa)?;
+        Ok(dfa)
     }
 
     #[test]
@@ -325,8 +341,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "(TODO THROW ERROR) ambiguous variables: foo collides with bar")]
     fn test_nfa_to_dfa_ambiguous_variable() {
-        parse("A{foo}B?{bar}").unwrap();
+        insta::assert_debug_snapshot!(parse("A{foo}B?{bar}"));
     }
 }

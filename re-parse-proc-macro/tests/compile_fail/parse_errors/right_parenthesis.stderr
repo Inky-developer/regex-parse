@@ -1,0 +1,5 @@
+error: Unexpected token ')'. Did you forget a '('?
+ --> tests/compile_fail/parse_errors/right_parenthesis.rs:4:15
+  |
+4 |     re_parse!(")", "111B222");
+  |               ^^^

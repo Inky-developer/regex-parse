@@ -1,0 +1,12 @@
+---
+source: re-parse-proc-macro/src/nfa.rs
+expression: "parse(\"{foo}bar{foo}\")"
+snapshot_kind: text
+---
+Err(
+    Nfa(
+        DuplicateVariable {
+            name: "foo",
+        },
+    ),
+)

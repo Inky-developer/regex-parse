@@ -1,0 +1,10 @@
+---
+source: re-parse-proc-macro/src/lib.rs
+expression: "dbg_re_parse!(\"A-\", \"A\")"
+snapshot_kind: text
+---
+fn main() {
+    ::core::compile_error! {
+        "Expected end of input, got '-'"
+    }
+}
