@@ -137,8 +137,19 @@ impl ProcMacroError {
 
 #[cfg(test)]
 mod tests {
-    use super::{re_parse_impl, ReParseInput};
+    use super::{re_parse_impl, ProcMacroErrorKind, ReParseInput};
+    use crate::dfa::Dfa;
+    use crate::nfa::Nfa;
+    use crate::regex::Regex;
+    use proptest::prelude::*;
     use quote::quote;
+
+    fn create_dfa(source: &str) -> Result<Dfa, ProcMacroErrorKind> {
+        let regex = Regex::from_str(source)?;
+        let nfa = Nfa::try_from(regex)?;
+        let dfa = Dfa::try_from(nfa)?;
+        Ok(dfa)
+    }
 
     fn test_re_parse(input: proc_macro2::TokenStream) -> String {
         let ReParseInput { regex, expression } = syn::parse2::<ReParseInput>(input).unwrap();
@@ -164,5 +175,13 @@ mod tests {
     #[test]
     fn test_macro_errors() {
         insta::assert_snapshot!(dbg_re_parse!("A-", "A"));
+    }
+
+    proptest! {
+        #[test]
+        fn macro_does_not_panic(s in "\\PC*") {
+            let dfa = create_dfa(&s);
+            prop_assume!(dfa.is_ok());
+        }
     }
 }
